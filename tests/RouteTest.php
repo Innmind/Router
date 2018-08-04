@@ -1,0 +1,63 @@
+<?php
+declare(strict_types = 1);
+
+namespace Tests\Innmind\Router;
+
+use Innmind\Router\{
+    Route,
+    Route\Name,
+};
+use Innmind\UrlTemplate\Template;
+use Innmind\Http\{
+    Message\ServerRequest,
+    Message\Method\Method,
+};
+use Innmind\Url\Url;
+use Innmind\Immutable\Str;
+use PHPUnit\Framework\TestCase;
+
+class RouteTest extends TestCase
+{
+    public function testInterface()
+    {
+        $route = new Route(
+            $name = new Name('foo'),
+            $template = Template::of('/foo'),
+            Method::post()
+        );
+
+        $this->assertSame($name, $route->name());
+        $this->assertSame($template, $route->template());
+    }
+
+    public function testOf()
+    {
+        $route = Route::of(new Name('foo'), Str::of('POST /foo/bar'));
+
+        $this->assertInstanceOf(Route::class, $route);
+        $this->assertSame('foo', (string) $route->name());
+        $this->assertSame('/foo/bar', (string) $route->template());
+    }
+
+    public function testMatches()
+    {
+        $route = Route::of(new Name('foo'), Str::of('POST /foo{+bar}'));
+
+        $request = $this->createMock(ServerRequest::class);
+        $request
+            ->expects($this->at(0))
+            ->method('method')
+            ->willReturn(Method::get());
+        $request
+            ->expects($this->at(1))
+            ->method('method')
+            ->willReturn(Method::post());
+        $request
+            ->expects($this->once())
+            ->method('url')
+            ->willReturn(Url::fromString('/foo/baz/bar'));
+
+        $this->assertFalse($route->matches($request));
+        $this->assertTrue($route->matches($request));
+    }
+}
