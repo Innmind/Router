@@ -7,6 +7,7 @@ use Innmind\Router\{
     Loader\Yaml,
     Loader,
     Route,
+    Exception\DomainException,
 };
 use Innmind\Url\Path;
 use Innmind\Immutable\SetInterface;
@@ -34,5 +35,19 @@ class YamlTest extends TestCase
         $this->assertSame('bar', (string) $routes->current()->name());
         $routes->next();
         $this->assertSame('baz', (string) $routes->current()->name());
+    }
+
+    public function testThrowWhenInvalidRouteName()
+    {
+        $this->expectException(DomainException::class);
+
+        (new Yaml)(new Path('fixtures/invalidRouteName.yml'));
+    }
+
+    public function testThrowWhenInvalidRouteTemplate()
+    {
+        $this->expectException(DomainException::class);
+
+        (new Yaml)(new Path('fixtures/invalidRouteTemplate.yml'));
     }
 }
