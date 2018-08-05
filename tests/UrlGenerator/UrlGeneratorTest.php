@@ -27,6 +27,14 @@ class UrlGeneratorTest extends TestCase
         );
     }
 
+    public function testThrowWhenInvalidRouteSet()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type SetInterface<Innmind\Router\Route>');
+
+        new UrlGenerator(Set::of('string'));
+    }
+
     public function testInvokation()
     {
         $generate = new UrlGenerator(
