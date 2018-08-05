@@ -20,7 +20,8 @@
         "innmind/immutable": "^2.8",
         "innmind/http": "^3.6",
         "innmind/url-template": "^1.2",
-        "symfony/yaml": "^4.1"
+        "symfony/yaml": "^4.1",
+        "innmind/compose": "^1.7"
     },
     "autoload": {
         "psr-4": {
