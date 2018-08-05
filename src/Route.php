@@ -4,10 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Router;
 
 use Innmind\Router\Route\Name;
-use Innmind\UrlTemplate\{
-    Template,
-    Exception\UrlDoesntMatchTemplate,
-};
+use Innmind\UrlTemplate\Template;
 use Innmind\Http\Message\{
     ServerRequest,
     Method,
@@ -54,12 +51,6 @@ final class Route
             return false;
         }
 
-        try {
-            $this->template->extract($request->url());
-
-            return true;
-        } catch (UrlDoesntMatchTemplate $e) {
-            return false;
-        }
+        return $this->template->matches($request->url());
     }
 }
