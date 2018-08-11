@@ -55,7 +55,7 @@ class RouteTest extends TestCase
         $request
             ->expects($this->once())
             ->method('url')
-            ->willReturn(Url::fromString('/foo/baz/bar'));
+            ->willReturn(Url::fromString('http://localhost:8000/foo/baz/bar'));
 
         $this->assertFalse($route->matches($request));
         $this->assertTrue($route->matches($request));

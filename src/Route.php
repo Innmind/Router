@@ -9,6 +9,10 @@ use Innmind\Http\Message\{
     ServerRequest,
     Method,
 };
+use Innmind\Url\{
+    NullScheme,
+    NullAuthority,
+};
 use Innmind\Immutable\Str;
 
 final class Route
@@ -51,6 +55,11 @@ final class Route
             return false;
         }
 
-        return $this->template->matches($request->url());
+        return $this->template->matches(
+            $request
+                ->url()
+                ->withScheme(new NullScheme)
+                ->withAuthority(new NullAuthority)
+        );
     }
 }
