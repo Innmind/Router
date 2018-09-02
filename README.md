@@ -17,31 +17,21 @@ composer require innmind/router
 ## Usage
 
 ```php
-use Innmind\Compose\ContainerBuilder\ContainerBuilder;
+use function Innmind\Router\bootstrap;
+use Innmind\Router\Route\Name;
 use Innmind\Url\{
     UrlInterface,
     PathInterface,
     Path,
 };
-use Innmind\Immutable\{
-    Map,
-    Set,
-};
-use Innmind\Router\Route\Name;
+use Innmind\Immutable\Set;
 
-$container = (new ContainerBuilder)(
-    new Path('container.yml'),
-    (new Map('string', 'mixed'))
-        ->put(
-            'routes',
-            Set::of(
-                PathInterface::class,
-                new Path('/to/routes/definitions.yml')
-            )
-        )
-);
-$route = $container->get('requestMatcher')($serverRequest); // Route or throws NoMatchingRouteFound
-$container->get('urlGenerator')(new Name('routeName')); // UrlInterface
+$router = bootstrap(Set::of(
+    PathInterface::class,
+    new Path('/to/routes/definitions.yml')
+));
+$route = $router['requestMatcher']($serverRequest); // Route or throws NoMatchingRouteFound
+$router['urlGenerator'](new Name('routeName')); // UrlInterface
 ```
 
 The routes definitions must look like this:
