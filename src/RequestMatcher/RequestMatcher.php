@@ -13,8 +13,12 @@ use Innmind\Immutable\Set;
 
 final class RequestMatcher implements RequestMatcherInterface
 {
+    /** @var Set<Route> */
     private Set $routes;
 
+    /**
+     * @param Set<Route> $routes
+     */
     public function __construct(Set $routes)
     {
         if ((string) $routes->type() !== Route::class) {

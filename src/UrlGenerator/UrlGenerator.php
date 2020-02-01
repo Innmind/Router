@@ -17,8 +17,12 @@ use Innmind\Immutable\{
 
 final class UrlGenerator implements UrlGeneratorInterface
 {
+    /** @var Map<string, Template> */
     private Map $routes;
 
+    /**
+     * @param Set<Route> $routes
+     */
     public function __construct(Set $routes)
     {
         if ((string) $routes->type() !== Route::class) {
@@ -28,6 +32,7 @@ final class UrlGenerator implements UrlGeneratorInterface
             ));
         }
 
+        /** @var Map<string, Template> */
         $this->routes = $routes->reduce(
             Map::of('string', Template::class),
             static function(Map $routes, Route $route): Map {
@@ -44,9 +49,12 @@ final class UrlGenerator implements UrlGeneratorInterface
      */
     public function __invoke(Name $route, Map $variables = null): Url
     {
+        /** @var Map<string, scalar|array> */
+        $default = Map::of('string', 'scalar|array');
+
         return $this
             ->routes
             ->get((string) $route)
-            ->expand($variables ?? Map::of('string', 'scalar|array'));
+            ->expand($variables ?? $default);
     }
 }
