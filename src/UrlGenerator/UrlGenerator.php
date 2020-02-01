@@ -18,7 +18,7 @@ use Innmind\Immutable\{
 
 final class UrlGenerator implements UrlGeneratorInterface
 {
-    private $routes;
+    private Map $routes;
 
     public function __construct(SetInterface $routes)
     {

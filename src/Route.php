@@ -17,9 +17,9 @@ use Innmind\Immutable\Str;
 
 final class Route
 {
-    private $name;
-    private $template;
-    private $method;
+    private Name $name;
+    private Template $template;
+    private Method $method;
 
     public function __construct(Name $name, Template $template, Method $method)
     {

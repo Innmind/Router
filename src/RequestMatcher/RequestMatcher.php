@@ -13,7 +13,7 @@ use Innmind\Immutable\SetInterface;
 
 final class RequestMatcher implements RequestMatcherInterface
 {
-    private $routes;
+    private SetInterface $routes;
 
     public function __construct(SetInterface $routes)
     {
