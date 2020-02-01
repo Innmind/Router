@@ -3,13 +3,13 @@ declare(strict_types = 1);
 
 namespace Innmind\Router;
 
-use Innmind\Url\PathInterface;
-use Innmind\Immutable\SetInterface;
+use Innmind\Url\Path;
+use Innmind\Immutable\Set;
 
 interface Loader
 {
     /**
-     * @return SetInterface<Route>
+     * @return Set<Route>
      */
-    public function __invoke(PathInterface ...$files): SetInterface;
+    public function __invoke(Path ...$files): Set;
 }

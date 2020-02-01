@@ -9,9 +9,8 @@ use Innmind\Router\{
     Route\Name,
     Exception\DomainException,
 };
-use Innmind\Url\PathInterface;
+use Innmind\Url\Path;
 use Innmind\Immutable\{
-    SetInterface,
     Set,
     Str,
 };
@@ -19,25 +18,26 @@ use Symfony\Component\Yaml\Yaml as Parser;
 
 final class Yaml implements Loader
 {
-    public function __invoke(PathInterface ...$files): SetInterface
+    public function __invoke(Path ...$files): Set
     {
-        $routes = Set::of(Route::class);
+        /** @var Set<Route> */
+        return Set::lazy(Route::class, function() use ($files): \Generator {
+            foreach ($files as $file) {
+                /** @var array<string|int, mixed> */
+                $content = Parser::parseFile($file->toString());
 
-        foreach ($files as $file) {
-            $content = Parser::parseFile((string) $file);
+                /** @var mixed $value */
+                foreach ($content as $key => $value) {
+                    if (!\is_string($key) || !\is_string($value)) {
+                        throw new DomainException('File must be an array<string, string>');
+                    }
 
-            foreach ($content as $key => $value) {
-                if (!is_string($key) || !is_string($value)) {
-                    throw new DomainException;
+                    yield Route::of(
+                        new Name($key),
+                        Str::of($value),
+                    );
                 }
-
-                $routes = $routes->add(Route::of(
-                    new Name($key),
-                    Str::of($value)
-                ));
             }
-        }
-
-        return $routes;
+        });
     }
 }

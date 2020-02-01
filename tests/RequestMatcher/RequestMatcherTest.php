@@ -12,7 +12,7 @@ use Innmind\Router\{
 };
 use Innmind\Http\Message\{
     ServerRequest,
-    Method\Method,
+    Method,
 };
 use Innmind\Url\Url;
 use Innmind\Immutable\{
@@ -34,7 +34,7 @@ class RequestMatcherTest extends TestCase
     public function testThrowWhenInvalidRouteSet()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type SetInterface<Innmind\Router\Route>');
+        $this->expectExceptionMessage('Argument 1 must be of type Set<Innmind\Router\Route>');
 
         new RequestMatcher(Set::of('string'));
     }
@@ -57,7 +57,7 @@ class RequestMatcherTest extends TestCase
         $request
             ->expects($this->once())
             ->method('url')
-            ->willReturn(Url::fromString('/foo'));
+            ->willReturn(Url::of('/foo'));
 
         $this->assertSame($route, $match($request));
     }

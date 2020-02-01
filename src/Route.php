@@ -9,17 +9,14 @@ use Innmind\Http\Message\{
     ServerRequest,
     Method,
 };
-use Innmind\Url\{
-    NullScheme,
-    NullAuthority,
-};
 use Innmind\Immutable\Str;
+use function Innmind\Immutable\unwrap;
 
 final class Route
 {
-    private $name;
-    private $template;
-    private $method;
+    private Name $name;
+    private Template $template;
+    private Method $method;
 
     public function __construct(Name $name, Template $template, Method $method)
     {
@@ -30,12 +27,12 @@ final class Route
 
     public static function of(Name $name, Str $pattern): self
     {
-        [$method, $template] = $pattern->split(' ');
+        [$method, $template] = unwrap($pattern->split(' '));
 
         return new self(
             $name,
-            Template::of((string) $template),
-            new Method\Method((string) $method->toUpper())
+            Template::of($template->toString()),
+            new Method($method->toUpper()->toString()),
         );
     }
 
@@ -51,15 +48,15 @@ final class Route
 
     public function matches(ServerRequest $request): bool
     {
-        if ((string) $request->method() !== (string) $this->method) {
+        if ($request->method()->toString() !== $this->method->toString()) {
             return false;
         }
 
         return $this->template->matches(
             $request
                 ->url()
-                ->withScheme(new NullScheme)
-                ->withAuthority(new NullAuthority)
+                ->withoutScheme()
+                ->withoutAuthority(),
         );
     }
 }

@@ -10,7 +10,7 @@ use Innmind\Router\{
 use Innmind\UrlTemplate\Template;
 use Innmind\Http\{
     Message\ServerRequest,
-    Message\Method\Method,
+    Message\Method,
 };
 use Innmind\Url\Url;
 use Innmind\Immutable\Str;
@@ -35,8 +35,8 @@ class RouteTest extends TestCase
         $route = Route::of(new Name('foo'), Str::of('POST /foo/bar'));
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertSame('foo', (string) $route->name());
-        $this->assertSame('/foo/bar', (string) $route->template());
+        $this->assertSame('foo', $route->name()->toString());
+        $this->assertSame('/foo/bar', $route->template()->toString());
     }
 
     public function testMatches()
@@ -55,7 +55,7 @@ class RouteTest extends TestCase
         $request
             ->expects($this->once())
             ->method('url')
-            ->willReturn(Url::fromString('http://localhost:8000/foo/baz/bar'));
+            ->willReturn(Url::of('http://localhost:8000/foo/baz/bar'));
 
         $this->assertFalse($route->matches($request));
         $this->assertTrue($route->matches($request));

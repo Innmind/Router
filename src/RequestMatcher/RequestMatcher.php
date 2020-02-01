@@ -9,41 +9,35 @@ use Innmind\Router\{
     Exception\NoMatchingRouteFound,
 };
 use Innmind\Http\Message\ServerRequest;
-use Innmind\Immutable\SetInterface;
+use Innmind\Immutable\{
+    Set,
+    Exception\NoElementMatchingPredicateFound,
+};
+use function Innmind\Immutable\assertSet;
 
 final class RequestMatcher implements RequestMatcherInterface
 {
-    private $routes;
+    /** @var Set<Route> */
+    private Set $routes;
 
-    public function __construct(SetInterface $routes)
+    /**
+     * @param Set<Route> $routes
+     */
+    public function __construct(Set $routes)
     {
-        if ((string) $routes->type() !== Route::class) {
-            throw new \TypeError(sprintf(
-                'Argument 1 must be of type SetInterface<%s>',
-                Route::class
-            ));
-        }
+        assertSet(Route::class, $routes, 1);
 
         $this->routes = $routes;
     }
 
     public function __invoke(ServerRequest $request): Route
     {
-        $route = $this->routes->reduce(
-            null,
-            static function(?Route $matched, Route $route) use ($request): ?Route {
-                if ($matched instanceof Route) {
-                    return $matched;
-                }
-
-                return $route->matches($request) ? $route : null;
-            }
-        );
-
-        if (!$route instanceof Route) {
+        try {
+            return $this->routes->find(
+                static fn(Route $route): bool => $route->matches($request),
+            );
+        } catch (NoElementMatchingPredicateFound $e) {
             throw new NoMatchingRouteFound;
         }
-
-        return $route;
     }
 }

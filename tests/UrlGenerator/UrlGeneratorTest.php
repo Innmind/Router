@@ -9,7 +9,7 @@ use Innmind\Router\{
     Route,
     Route\Name,
 };
-use Innmind\Url\UrlInterface;
+use Innmind\Url\Url;
 use Innmind\Immutable\{
     Set,
     Str,
@@ -30,7 +30,7 @@ class UrlGeneratorTest extends TestCase
     public function testThrowWhenInvalidRouteSet()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type SetInterface<Innmind\Router\Route>');
+        $this->expectExceptionMessage('Argument 1 must be of type Set<Innmind\Router\Route>');
 
         new UrlGenerator(Set::of('string'));
     }
@@ -48,38 +48,38 @@ class UrlGeneratorTest extends TestCase
             )
         );
 
-        $this->assertInstanceOf(UrlInterface::class, $generate(new Name('create')));
+        $this->assertInstanceOf(Url::class, $generate(new Name('create')));
         $this->assertSame(
             '/resource',
-            (string) $generate(new Name('create'))
+            $generate(new Name('create'))->toString(),
         );
         $this->assertSame(
             '/resource',
-            (string) $generate(new Name('list'))
+            $generate(new Name('list'))->toString(),
         );
         $this->assertSame(
             '/resource/ecdd5bdc-943e-4a4f-8d16-255892bcacaa',
-            (string) $generate(
+            $generate(
                 new Name('read'),
-                (new Map('string', 'variable'))
-                    ->put('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa')
-            )
+                Map::of('string', 'scalar|array')
+                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa')
+            )->toString(),
         );
         $this->assertSame(
             '/resource/ecdd5bdc-943e-4a4f-8d16-255892bcacaa',
-            (string) $generate(
+            $generate(
                 new Name('update'),
-                (new Map('string', 'variable'))
-                    ->put('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa')
-            )
+                Map::of('string', 'scalar|array')
+                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa')
+            )->toString(),
         );
         $this->assertSame(
             '/resource/ecdd5bdc-943e-4a4f-8d16-255892bcacaa',
-            (string) $generate(
+            $generate(
                 new Name('delete'),
-                (new Map('string', 'variable'))
-                    ->put('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa')
-            )
+                Map::of('string', 'scalar|array')
+                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa')
+            )->toString(),
         );
     }
 }

@@ -4,13 +4,13 @@ declare(strict_types = 1);
 namespace Innmind\Router;
 
 use Innmind\Router\Route\Name;
-use Innmind\Url\UrlInterface;
-use Innmind\Immutable\MapInterface;
+use Innmind\Url\Url;
+use Innmind\Immutable\Map;
 
 interface UrlGenerator
 {
     /**
-     * @param MapInterface<string, variable> $variables
+     * @param Map<string, scalar|array> $variables
      */
-    public function __invoke(Name $route, MapInterface $variables = null): UrlInterface;
+    public function __invoke(Name $route, Map $variables = null): Url;
 }

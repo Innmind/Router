@@ -8,46 +8,41 @@ use Innmind\Router\{
     Route,
     Route\Name,
 };
-use Innmind\Url\UrlInterface;
+use Innmind\Url\Url;
 use Innmind\UrlTemplate\Template;
 use Innmind\Immutable\{
-    MapInterface,
     Map,
-    SetInterface,
+    Set,
 };
+use function Innmind\Immutable\assertSet;
 
 final class UrlGenerator implements UrlGeneratorInterface
 {
-    private $routes;
+    /** @var Set<Route> */
+    private Set $routes;
 
-    public function __construct(SetInterface $routes)
+    /**
+     * @param Set<Route> $routes
+     */
+    public function __construct(Set $routes)
     {
-        if ((string) $routes->type() !== Route::class) {
-            throw new \TypeError(sprintf(
-                'Argument 1 must be of type SetInterface<%s>',
-                Route::class
-            ));
-        }
+        assertSet(Route::class, $routes, 1);
 
-        $this->routes = $routes->reduce(
-            new Map('string', Template::class),
-            static function(MapInterface $routes, Route $route): MapInterface {
-                return $routes->put(
-                    (string) $route->name(),
-                    $route->template()
-                );
-            }
-        );
+        $this->routes = $routes;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function __invoke(Name $route, MapInterface $variables = null): UrlInterface
+    public function __invoke(Name $route, Map $variables = null): Url
     {
+        /** @var Map<string, scalar|array> */
+        $default = Map::of('string', 'scalar|array');
+
         return $this
             ->routes
-            ->get((string) $route)
-            ->expand($variables ?? new Map('string', 'variable'));
+            ->find(static fn(Route $candidate): bool => $candidate->name()->equals($route))
+            ->template()
+            ->expand($variables ?? $default);
     }
 }

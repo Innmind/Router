@@ -1,10 +1,8 @@
 # Router
 
-| `master` | `develop` |
-|----------|-----------|
-| [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/Router/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Innmind/Router/?branch=master) | [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/Router/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Router/?branch=develop) |
-| [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/Router/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Innmind/Router/?branch=master) | [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/Router/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Router/?branch=develop) |
-| [![Build Status](https://scrutinizer-ci.com/g/Innmind/Router/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Innmind/Router/build-status/master) | [![Build Status](https://scrutinizer-ci.com/g/Innmind/Router/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Router/build-status/develop) |
+[![codecov](https://codecov.io/gh/Innmind/Router/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/Router)
+[![Build Status](https://github.com/Innmind/Router/workflows/CI/badge.svg)](https://github.com/Innmind/Router/actions?query=workflow%3ACI)
+[![Type Coverage](https://shepherd.dev/github/Innmind/Router/coverage.svg)](https://shepherd.dev/github/Innmind/Router)
 
 Simple router using [url templates](https://github.com/Innmind/UrlTemplate) as route patterns.
 
@@ -20,18 +18,15 @@ composer require innmind/router
 use function Innmind\Router\bootstrap;
 use Innmind\Router\Route\Name;
 use Innmind\Url\{
-    UrlInterface,
-    PathInterface,
+    Url,
     Path,
 };
-use Innmind\Immutable\Set;
 
-$router = bootstrap(Set::of(
-    PathInterface::class,
+$router = bootstrap(
     new Path('/to/routes/definitions.yml')
-));
+);
 $route = $router['requestMatcher']($serverRequest); // Route or throws NoMatchingRouteFound
-$router['urlGenerator'](new Name('routeName')); // UrlInterface
+$router['urlGenerator'](new Name('routeName')); // Url
 ```
 
 The routes definitions must look like this:
