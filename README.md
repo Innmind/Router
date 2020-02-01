@@ -1,10 +1,9 @@
 # Router
 
-| `master` | `develop` |
-|----------|-----------|
-| [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/Router/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Innmind/Router/?branch=master) | [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/Router/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Router/?branch=develop) |
-| [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/Router/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Innmind/Router/?branch=master) | [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/Router/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Router/?branch=develop) |
-| [![Build Status](https://scrutinizer-ci.com/g/Innmind/Router/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Innmind/Router/build-status/master) | [![Build Status](https://scrutinizer-ci.com/g/Innmind/Router/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Router/build-status/develop) |
+|-----------|
+| [![codecov](https://codecov.io/gh/Innmind/Filesystem/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/Filesystem) |
+| [![Build Status](https://github.com/Innmind/Filesystem/workflows/CI/badge.svg)](https://github.com/Innmind/Filesystem/actions?query=workflow%3ACI) |
+| [![Type Coverage](https://shepherd.dev/github/Innmind/Filesystem/coverage.svg)](https://shepherd.dev/github/Innmind/Filesystem) |
 
 Simple router using [url templates](https://github.com/Innmind/UrlTemplate) as route patterns.
 
