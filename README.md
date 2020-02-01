@@ -1,9 +1,8 @@
 # Router
 
-|-----------|
-| [![codecov](https://codecov.io/gh/Innmind/Filesystem/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/Filesystem) |
-| [![Build Status](https://github.com/Innmind/Filesystem/workflows/CI/badge.svg)](https://github.com/Innmind/Filesystem/actions?query=workflow%3ACI) |
-| [![Type Coverage](https://shepherd.dev/github/Innmind/Filesystem/coverage.svg)](https://shepherd.dev/github/Innmind/Filesystem) |
+[![codecov](https://codecov.io/gh/Innmind/Filesystem/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/Filesystem)
+[![Build Status](https://github.com/Innmind/Filesystem/workflows/CI/badge.svg)](https://github.com/Innmind/Filesystem/actions?query=workflow%3ACI)
+[![Type Coverage](https://shepherd.dev/github/Innmind/Filesystem/coverage.svg)](https://shepherd.dev/github/Innmind/Filesystem)
 
 Simple router using [url templates](https://github.com/Innmind/UrlTemplate) as route patterns.
 
