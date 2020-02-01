@@ -28,13 +28,13 @@ final class Yaml implements Loader
 
                 /** @var mixed $value */
                 foreach ($content as $key => $value) {
-                    if (!is_string($key) || !is_string($value)) {
+                    if (!\is_string($key) || !\is_string($value)) {
                         throw new DomainException;
                     }
 
                     yield Route::of(
                         new Name($key),
-                        Str::of($value)
+                        Str::of($value),
                     );
                 }
             }
