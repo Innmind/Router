@@ -9,15 +9,10 @@ use Innmind\Router\{
     Loader\Yaml,
 };
 use Innmind\Url\Path;
-use Innmind\Immutable\Set;
-use function Innmind\Immutable\unwrap;
 
-/**
- * @param Set<Path> $routes
- */
-function bootstrap(Set $routes): array
+function bootstrap(Path ...$routes): array
 {
-    $routes = (new Yaml)(...unwrap($routes));
+    $routes = (new Yaml)(...$routes);
 
     return [
         'requestMatcher' => new RequestMatcher($routes),

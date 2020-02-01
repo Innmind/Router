@@ -9,14 +9,13 @@ use Innmind\Router\{
     UrlGenerator\UrlGenerator,
 };
 use Innmind\Url\Path;
-use Innmind\Immutable\Set;
 use PHPUnit\Framework\TestCase;
 
 class BootstrapTest extends TestCase
 {
     public function testBootstrap()
     {
-        $services = bootstrap(Set::of(Path::class));
+        $services = bootstrap(Path::of('fixtures/routes1.yml'));
 
         $this->assertInstanceOf(RequestMatcher::class, $services['requestMatcher']);
         $this->assertInstanceOf(UrlGenerator::class, $services['urlGenerator']);
