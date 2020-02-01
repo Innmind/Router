@@ -51,6 +51,7 @@ class YamlTest extends TestCase
     public function testThrowWhenInvalidRouteName()
     {
         $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('File must be an array<string, string>');
 
         unwrap((new Yaml)(Path::of('fixtures/invalidRouteName.yml')));
     }
@@ -58,6 +59,7 @@ class YamlTest extends TestCase
     public function testThrowWhenInvalidRouteTemplate()
     {
         $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('File must be an array<string, string>');
 
         unwrap((new Yaml)(Path::of('fixtures/invalidRouteTemplate.yml')));
     }

@@ -29,7 +29,7 @@ final class Yaml implements Loader
                 /** @var mixed $value */
                 foreach ($content as $key => $value) {
                     if (!\is_string($key) || !\is_string($value)) {
-                        throw new DomainException;
+                        throw new DomainException('File must be an array<string, string>');
                     }
 
                     yield Route::of(
