@@ -10,6 +10,7 @@ use Innmind\Router\{
 };
 use Innmind\Http\Message\ServerRequest;
 use Innmind\Immutable\Set;
+use function Innmind\Immutable\assertSet;
 
 final class RequestMatcher implements RequestMatcherInterface
 {
@@ -21,12 +22,7 @@ final class RequestMatcher implements RequestMatcherInterface
      */
     public function __construct(Set $routes)
     {
-        if ((string) $routes->type() !== Route::class) {
-            throw new \TypeError(sprintf(
-                'Argument 1 must be of type Set<%s>',
-                Route::class,
-            ));
-        }
+        assertSet(Route::class, $routes, 1);
 
         $this->routes = $routes;
     }

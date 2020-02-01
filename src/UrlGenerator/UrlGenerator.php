@@ -14,6 +14,7 @@ use Innmind\Immutable\{
     Map,
     Set,
 };
+use function Innmind\Immutable\assertSet;
 
 final class UrlGenerator implements UrlGeneratorInterface
 {
@@ -25,21 +26,14 @@ final class UrlGenerator implements UrlGeneratorInterface
      */
     public function __construct(Set $routes)
     {
-        if ((string) $routes->type() !== Route::class) {
-            throw new \TypeError(sprintf(
-                'Argument 1 must be of type Set<%s>',
-                Route::class,
-            ));
-        }
+        assertSet(Route::class, $routes, 1);
 
         /** @var Map<string, Template> */
-        $this->routes = $routes->reduce(
-            Map::of('string', Template::class),
-            static function(Map $routes, Route $route): Map {
-                return ($routes)(
-                    (string) $route->name(),
-                    $route->template(),
-                );
+        $this->routes = $routes->toMapOf(
+            'string',
+            Template::class,
+            static function(Route $route): \Generator {
+                yield (string) $route->name() => $route->template();
             }
         );
     }

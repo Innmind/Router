@@ -56,7 +56,7 @@ final class Route
             $request
                 ->url()
                 ->withoutScheme()
-                ->withoutAuthority()
+                ->withoutAuthority(),
         );
     }
 }
