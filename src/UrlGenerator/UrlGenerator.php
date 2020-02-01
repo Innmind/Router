@@ -8,33 +8,32 @@ use Innmind\Router\{
     Route,
     Route\Name,
 };
-use Innmind\Url\UrlInterface;
+use Innmind\Url\Url;
 use Innmind\UrlTemplate\Template;
 use Innmind\Immutable\{
-    MapInterface,
     Map,
-    SetInterface,
+    Set,
 };
 
 final class UrlGenerator implements UrlGeneratorInterface
 {
     private Map $routes;
 
-    public function __construct(SetInterface $routes)
+    public function __construct(Set $routes)
     {
         if ((string) $routes->type() !== Route::class) {
             throw new \TypeError(sprintf(
-                'Argument 1 must be of type SetInterface<%s>',
-                Route::class
+                'Argument 1 must be of type Set<%s>',
+                Route::class,
             ));
         }
 
         $this->routes = $routes->reduce(
-            new Map('string', Template::class),
-            static function(MapInterface $routes, Route $route): MapInterface {
-                return $routes->put(
+            Map::of('string', Template::class),
+            static function(Map $routes, Route $route): Map {
+                return ($routes)(
                     (string) $route->name(),
-                    $route->template()
+                    $route->template(),
                 );
             }
         );
@@ -43,11 +42,11 @@ final class UrlGenerator implements UrlGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function __invoke(Name $route, MapInterface $variables = null): UrlInterface
+    public function __invoke(Name $route, Map $variables = null): Url
     {
         return $this
             ->routes
             ->get((string) $route)
-            ->expand($variables ?? new Map('string', 'variable'));
+            ->expand($variables ?? Map::of('string', 'scalar|array'));
     }
 }

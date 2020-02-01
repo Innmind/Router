@@ -9,18 +9,18 @@ use Innmind\Router\{
     Exception\NoMatchingRouteFound,
 };
 use Innmind\Http\Message\ServerRequest;
-use Innmind\Immutable\SetInterface;
+use Innmind\Immutable\Set;
 
 final class RequestMatcher implements RequestMatcherInterface
 {
-    private SetInterface $routes;
+    private Set $routes;
 
-    public function __construct(SetInterface $routes)
+    public function __construct(Set $routes)
     {
         if ((string) $routes->type() !== Route::class) {
             throw new \TypeError(sprintf(
-                'Argument 1 must be of type SetInterface<%s>',
-                Route::class
+                'Argument 1 must be of type Set<%s>',
+                Route::class,
             ));
         }
 

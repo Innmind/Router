@@ -8,14 +8,16 @@ use Innmind\Router\{
     UrlGenerator\UrlGenerator,
     Loader\Yaml,
 };
-use Innmind\Immutable\SetInterface;
+use Innmind\Url\Path;
+use Innmind\Immutable\Set;
+use function Innmind\Immutable\unwrap;
 
 /**
- * @param SetInterface<PathInterface> $routes
+ * @param Set<Path> $routes
  */
-function bootstrap(SetInterface $routes): array
+function bootstrap(Set $routes): array
 {
-    $routes = (new Yaml)(...$routes);
+    $routes = (new Yaml)(...unwrap($routes));
 
     return [
         'requestMatcher' => new RequestMatcher($routes),

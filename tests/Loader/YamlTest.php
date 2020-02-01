@@ -10,7 +10,8 @@ use Innmind\Router\{
     Exception\DomainException,
 };
 use Innmind\Url\Path;
-use Innmind\Immutable\SetInterface;
+use Innmind\Immutable\Set;
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class YamlTest extends TestCase
@@ -23,31 +24,32 @@ class YamlTest extends TestCase
     public function testInvokation()
     {
         $routes = (new Yaml)(
-            new Path('fixtures/routes1.yml'),
-            new Path('fixtures/routes2.yml')
+            Path::of('fixtures/routes1.yml'),
+            Path::of('fixtures/routes2.yml'),
         );
 
-        $this->assertInstanceOf(SetInterface::class, $routes);
-        $this->assertSame(Route::class, (string) $routes->type());
+        $this->assertInstanceOf(Set::class, $routes);
+        $this->assertSame(Route::class, $routes->type());
         $this->assertCount(3, $routes);
-        $this->assertSame('foo', (string) $routes->current()->name());
-        $routes->next();
-        $this->assertSame('bar', (string) $routes->current()->name());
-        $routes->next();
-        $this->assertSame('baz', (string) $routes->current()->name());
+        $routes = unwrap($routes);
+        $this->assertSame('foo', (string) \current($routes)->name());
+        \next($routes);
+        $this->assertSame('bar', (string) \current($routes)->name());
+        \next($routes);
+        $this->assertSame('baz', (string) \current($routes)->name());
     }
 
     public function testThrowWhenInvalidRouteName()
     {
         $this->expectException(DomainException::class);
 
-        (new Yaml)(new Path('fixtures/invalidRouteName.yml'));
+        (new Yaml)(Path::of('fixtures/invalidRouteName.yml'));
     }
 
     public function testThrowWhenInvalidRouteTemplate()
     {
         $this->expectException(DomainException::class);
 
-        (new Yaml)(new Path('fixtures/invalidRouteTemplate.yml'));
+        (new Yaml)(Path::of('fixtures/invalidRouteTemplate.yml'));
     }
 }
