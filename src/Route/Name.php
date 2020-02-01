@@ -19,6 +19,11 @@ final class Name
         $this->value = $value;
     }
 
+    public function equals(self $route): bool
+    {
+        return $this->value === $route->value;
+    }
+
     public function __toString(): string
     {
         return $this->value;

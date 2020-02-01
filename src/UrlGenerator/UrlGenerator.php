@@ -18,8 +18,8 @@ use function Innmind\Immutable\assertSet;
 
 final class UrlGenerator implements UrlGeneratorInterface
 {
-    /** @var Map<string, Template> */
-    private Map $routes;
+    /** @var Set<Route> */
+    private Set $routes;
 
     /**
      * @param Set<Route> $routes
@@ -28,14 +28,7 @@ final class UrlGenerator implements UrlGeneratorInterface
     {
         assertSet(Route::class, $routes, 1);
 
-        /** @var Map<string, Template> */
-        $this->routes = $routes->toMapOf(
-            'string',
-            Template::class,
-            static function(Route $route): \Generator {
-                yield (string) $route->name() => $route->template();
-            }
-        );
+        $this->routes = $routes;
     }
 
     /**
@@ -48,7 +41,8 @@ final class UrlGenerator implements UrlGeneratorInterface
 
         return $this
             ->routes
-            ->get((string) $route)
+            ->find(static fn(Route $candidate): bool => $candidate->name()->equals($route))
+            ->template()
             ->expand($variables ?? $default);
     }
 }

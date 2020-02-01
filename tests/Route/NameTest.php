@@ -29,6 +29,20 @@ class NameTest extends TestCase
             });
     }
 
+    public function testEquals()
+    {
+        $this
+            ->forAll(Generator\string(), Generator\string())
+            ->when(static function($a, $b): bool {
+                return $a !== '' && $b !== '';
+            })
+            ->then(function($a, $b): void {
+                $this->assertTrue((new Name($a))->equals(new Name($a)));
+                $this->assertFalse((new Name($a))->equals(new Name($b)));
+                $this->assertFalse((new Name($b))->equals(new Name($a)));
+            });
+    }
+
     public function testThrowWhenEmptyName()
     {
         $this->expectException(DomainException::class);

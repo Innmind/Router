@@ -9,7 +9,10 @@ use Innmind\Router\{
     Exception\NoMatchingRouteFound,
 };
 use Innmind\Http\Message\ServerRequest;
-use Innmind\Immutable\Set;
+use Innmind\Immutable\{
+    Set,
+    Exception\NoElementMatchingPredicateFound,
+};
 use function Innmind\Immutable\assertSet;
 
 final class RequestMatcher implements RequestMatcherInterface
@@ -29,21 +32,12 @@ final class RequestMatcher implements RequestMatcherInterface
 
     public function __invoke(ServerRequest $request): Route
     {
-        $route = $this->routes->reduce(
-            null,
-            static function(?Route $matched, Route $route) use ($request): ?Route {
-                if ($matched instanceof Route) {
-                    return $matched;
-                }
-
-                return $route->matches($request) ? $route : null;
-            }
-        );
-
-        if (!$route instanceof Route) {
+        try {
+            return $this->routes->find(
+                static fn(Route $route): bool => $route->matches($request),
+            );
+        } catch (NoElementMatchingPredicateFound $e) {
             throw new NoMatchingRouteFound;
         }
-
-        return $route;
     }
 }

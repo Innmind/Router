@@ -39,17 +39,26 @@ class YamlTest extends TestCase
         $this->assertSame('baz', (string) \current($routes)->name());
     }
 
+    public function testFilesAreNotParsedWhenCallingTheParser()
+    {
+        // this call would throw if the file were to be parsed when parser called
+        $this->assertInstanceOf(
+            Set::class,
+            (new Yaml)(Path::of('fixtures/invalidRouteName.yml')),
+        );
+    }
+
     public function testThrowWhenInvalidRouteName()
     {
         $this->expectException(DomainException::class);
 
-        (new Yaml)(Path::of('fixtures/invalidRouteName.yml'));
+        unwrap((new Yaml)(Path::of('fixtures/invalidRouteName.yml')));
     }
 
     public function testThrowWhenInvalidRouteTemplate()
     {
         $this->expectException(DomainException::class);
 
-        (new Yaml)(Path::of('fixtures/invalidRouteTemplate.yml'));
+        unwrap((new Yaml)(Path::of('fixtures/invalidRouteTemplate.yml')));
     }
 }
