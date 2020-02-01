@@ -24,7 +24,7 @@ final class Name
         return $this->value === $route->value;
     }
 
-    public function __toString(): string
+    public function toString(): string
     {
         return $this->value;
     }

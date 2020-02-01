@@ -32,11 +32,11 @@ class YamlTest extends TestCase
         $this->assertSame(Route::class, $routes->type());
         $this->assertCount(3, $routes);
         $routes = unwrap($routes);
-        $this->assertSame('foo', (string) \current($routes)->name());
+        $this->assertSame('foo', \current($routes)->name()->toString());
         \next($routes);
-        $this->assertSame('bar', (string) \current($routes)->name());
+        $this->assertSame('bar', \current($routes)->name()->toString());
         \next($routes);
-        $this->assertSame('baz', (string) \current($routes)->name());
+        $this->assertSame('baz', \current($routes)->name()->toString());
     }
 
     public function testFilesAreNotParsedWhenCallingTheParser()

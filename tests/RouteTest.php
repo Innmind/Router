@@ -35,7 +35,7 @@ class RouteTest extends TestCase
         $route = Route::of(new Name('foo'), Str::of('POST /foo/bar'));
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertSame('foo', (string) $route->name());
+        $this->assertSame('foo', $route->name()->toString());
         $this->assertSame('/foo/bar', $route->template()->toString());
     }
 
