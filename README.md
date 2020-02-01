@@ -19,18 +19,15 @@ composer require innmind/router
 use function Innmind\Router\bootstrap;
 use Innmind\Router\Route\Name;
 use Innmind\Url\{
-    UrlInterface,
-    PathInterface,
+    Url,
     Path,
 };
-use Innmind\Immutable\Set;
 
-$router = bootstrap(Set::of(
-    PathInterface::class,
+$router = bootstrap(
     new Path('/to/routes/definitions.yml')
-));
+);
 $route = $router['requestMatcher']($serverRequest); // Route or throws NoMatchingRouteFound
-$router['urlGenerator'](new Name('routeName')); // UrlInterface
+$router['urlGenerator'](new Name('routeName')); // Url
 ```
 
 The routes definitions must look like this:
