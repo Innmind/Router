@@ -45,13 +45,12 @@ class RouteTest extends TestCase
 
         $request = $this->createMock(ServerRequest::class);
         $request
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('method')
-            ->willReturn(Method::get());
-        $request
-            ->expects($this->at(1))
-            ->method('method')
-            ->willReturn(Method::post());
+            ->will($this->onConsecutiveCalls(
+                Method::get(),
+                Method::post(),
+            ));
         $request
             ->expects($this->once())
             ->method('url')
