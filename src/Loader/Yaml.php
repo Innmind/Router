@@ -21,7 +21,7 @@ final class Yaml implements Loader
     public function __invoke(Path ...$files): Set
     {
         /** @var Set<Route> */
-        return Set::lazy(Route::class, function() use ($files): \Generator {
+        return Set::lazy(Route::class, static function() use ($files): \Generator {
             foreach ($files as $file) {
                 /** @var array<string|int, mixed> */
                 $content = Parser::parseFile($file->toString());
