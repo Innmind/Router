@@ -1,6 +1,6 @@
 # Router
 
-[![codecov](https://codecov.io/gh/Innmind/Router/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/Router)
+[![codecov](https://codecov.io/gh/Innmind/Router/branch/develop/graph/badge.svg?branch=master)](https://codecov.io/gh/Innmind/Router)
 [![Build Status](https://github.com/Innmind/Router/workflows/CI/badge.svg)](https://github.com/Innmind/Router/actions?query=workflow%3ACI)
 [![Type Coverage](https://shepherd.dev/github/Innmind/Router/coverage.svg)](https://shepherd.dev/github/Innmind/Router)
 

@@ -8,22 +8,19 @@ use Innmind\Router\{
     Exception\DomainException,
 };
 use PHPUnit\Framework\TestCase;
-use Eris\{
-    Generator,
-    TestTrait,
+use Innmind\BlackBox\{
+    PHPUnit\BlackBox,
+    Set,
 };
 
 class NameTest extends TestCase
 {
-    use TestTrait;
+    use BlackBox;
 
     public function testInterface()
     {
         $this
-            ->forAll(Generator\string())
-            ->when(static function(string $value): bool {
-                return $value !== '';
-            })
+            ->forAll(Set\Strings::any()->filter(static fn($value) => $value !== ''))
             ->then(function(string $value): void {
                 $this->assertSame($value, (new Name($value))->toString());
             });
@@ -32,9 +29,12 @@ class NameTest extends TestCase
     public function testEquals()
     {
         $this
-            ->forAll(Generator\string(), Generator\string())
-            ->when(static function($a, $b): bool {
-                return $a !== '' && $b !== '';
+            ->forAll(
+                Set\Strings::any()->filter(static fn($value) => $value !== ''),
+                Set\Strings::any()->filter(static fn($value) => $value !== '')
+            )
+            ->filter(static function($a, $b): bool {
+                return $a !== $b;
             })
             ->then(function($a, $b): void {
                 $this->assertTrue((new Name($a))->equals(new Name($a)));

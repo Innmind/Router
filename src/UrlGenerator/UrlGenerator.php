@@ -9,7 +9,6 @@ use Innmind\Router\{
     Route\Name,
 };
 use Innmind\Url\Url;
-use Innmind\UrlTemplate\Template;
 use Innmind\Immutable\{
     Map,
     Set,
@@ -31,9 +30,6 @@ final class UrlGenerator implements UrlGeneratorInterface
         $this->routes = $routes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke(Name $route, Map $variables = null): Url
     {
         /** @var Map<string, scalar|array> */
