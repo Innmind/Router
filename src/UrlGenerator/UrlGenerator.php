@@ -32,7 +32,7 @@ final class UrlGenerator implements UrlGeneratorInterface
     {
         return $this
             ->routes
-            ->find(static fn(Route $candidate): bool => $candidate->name()->equals($route))
+            ->find(static fn(Route $candidate): bool => $candidate->is($route))
             ->map(static fn($route) => $route->template())
             ->map(static fn($template) => $template->expand($variables ?? Map::of()))
             ->match(

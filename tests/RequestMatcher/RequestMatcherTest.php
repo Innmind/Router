@@ -32,9 +32,9 @@ class RequestMatcherTest extends TestCase
     {
         $match = new RequestMatcher(
             Sequence::of(
-                Route::of(Name::of('baz'), Method::delete, Template::of('/foo')),
-                $route = Route::of(Name::of('foo'), Method::post, Template::of('/foo')),
-                Route::of(Name::of('bar'), Method::get, Template::of('/foo')),
+                Route::of(Method::delete, Template::of('/foo')),
+                $route = Route::of(Method::post, Template::of('/foo')),
+                Route::of(Method::get, Template::of('/foo')),
             ),
         );
         $request = $this->createMock(ServerRequest::class);
@@ -57,9 +57,9 @@ class RequestMatcherTest extends TestCase
     {
         $match = new RequestMatcher(
             Sequence::of(
-                Route::of(Name::of('baz'), Method::delete, Template::of('/foo')),
-                Route::of(Name::of('foo'), Method::post, Template::of('/foo')),
-                Route::of(Name::of('bar'), Method::get, Template::of('/foo')),
+                Route::of(Method::delete, Template::of('/foo')),
+                Route::of(Method::post, Template::of('/foo')),
+                Route::of(Method::get, Template::of('/foo')),
             ),
         );
         $request = $this->createMock(ServerRequest::class);

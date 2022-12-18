@@ -29,27 +29,27 @@ class RouteTest extends TestCase
     public function testInterface()
     {
         $route = Route::of(
-            $name = Name::of('foo'),
             Method::post,
             $template = Template::of('/foo'),
-        );
+        )->named($name = Name::of('foo'));
 
-        $this->assertSame($name, $route->name());
+        $this->assertTrue($route->is($name));
+        $this->assertFalse($route->is(Name::of('bat')));
         $this->assertSame($template, $route->template());
     }
 
     public function testOf()
     {
-        $route = Route::of(Name::of('foo'), Method::post, Template::of('/foo/bar'));
+        $route = Route::of(Method::post, Template::of('/foo/bar'))->named(Name::of('foo'));
 
         $this->assertInstanceOf(Route::class, $route);
-        $this->assertSame('foo', $route->name()->toString());
+        $this->assertTrue($route->is(Name::of('foo')));
         $this->assertSame('/foo/bar', $route->template()->toString());
     }
 
     public function testMatches()
     {
-        $route = Route::of(Name::of('foo'), Method::post, Template::of('/foo{+bar}'));
+        $route = Route::of(Method::post, Template::of('/foo{+bar}'));
 
         $request = $this->createMock(ServerRequest::class);
         $request
@@ -73,7 +73,7 @@ class RouteTest extends TestCase
         $this
             ->forAll(Set\Elements::of(...ProtocolVersion::cases()))
             ->then(function($protocol) {
-                $route = Route::of(Name::of('foo'), Method::post, Template::of('/foo{+bar}'));
+                $route = Route::of(Method::post, Template::of('/foo{+bar}'));
                 $request = $this->createMock(ServerRequest::class);
                 $request
                     ->expects($this->once())
@@ -95,7 +95,7 @@ class RouteTest extends TestCase
             ->then(function($protocol) {
                 $request = $this->createMock(ServerRequest::class);
                 $expected = $this->createMock(Response::class);
-                $route = Route::of(Name::of('foo'), Method::post, Template::of('/foo{+bar}'))->handle(
+                $route = Route::of(Method::post, Template::of('/foo{+bar}'))->handle(
                     function($serverRequest) use ($request, $expected) {
                         $this->assertSame($request, $serverRequest);
 

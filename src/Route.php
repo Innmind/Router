@@ -11,23 +11,26 @@ use Innmind\Http\Message\{
     Response,
     StatusCode,
 };
+use Innmind\Immutable\Maybe;
 
 /**
  * @psalm-immutable
  */
 final class Route
 {
-    private Name $name;
+    /** @var Maybe<Name> */
+    private Maybe $name;
     private Template $template;
     private Method $method;
     /** @var callable(ServerRequest): Response */
     private $handler;
 
     /**
+     * @param Maybe<Name> $name
      * @param callable(ServerRequest): Response $handler
      */
     private function __construct(
-        Name $name,
+        Maybe $name,
         Method $method,
         Template $template,
         callable $handler,
@@ -41,8 +44,11 @@ final class Route
     /**
      * @psalm-pure
      */
-    public static function of(Name $name, Method $method, Template $template): self
+    public static function of(Method $method, Template $template): self
     {
+        /** @var Maybe<Name> */
+        $name = Maybe::nothing();
+
         return new self(
             $name,
             $method,
@@ -54,9 +60,22 @@ final class Route
         );
     }
 
-    public function name(): Name
+    public function named(Name $name): self
     {
-        return $this->name;
+        return new self(
+            Maybe::just($name),
+            $this->method,
+            $this->template,
+            $this->handler,
+        );
+    }
+
+    public function is(Name $name): bool
+    {
+        return $this->name->match(
+            static fn($self) => $self->equals($name),
+            static fn() => false,
+        );
     }
 
     public function template(): Template

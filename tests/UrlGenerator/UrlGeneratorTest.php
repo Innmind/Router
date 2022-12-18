@@ -33,11 +33,11 @@ class UrlGeneratorTest extends TestCase
     {
         $generate = new UrlGenerator(
             Sequence::of(
-                Route::of(Name::of('create'), Method::post, Template::of('/resource')),
-                Route::of(Name::of('list'), Method::get, Template::of('/resource')),
-                Route::of(Name::of('read'), Method::get, Template::of('/resource/{id}')),
-                Route::of(Name::of('update'), Method::put, Template::of('/resource/{id}')),
-                Route::of(Name::of('delete'), Method::delete, Template::of('/resource/{id}')),
+                Route::of(Method::post, Template::of('/resource'))->named(Name::of('create')),
+                Route::of(Method::get, Template::of('/resource'))->named(Name::of('list')),
+                Route::of(Method::get, Template::of('/resource/{id}'))->named(Name::of('read')),
+                Route::of(Method::put, Template::of('/resource/{id}'))->named(Name::of('update')),
+                Route::of(Method::delete, Template::of('/resource/{id}'))->named(Name::of('delete')),
             ),
         );
 
