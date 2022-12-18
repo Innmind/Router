@@ -19,10 +19,10 @@ class RouteTest extends TestCase
 {
     public function testInterface()
     {
-        $route = new Route(
+        $route = Route::of(
             $name = new Name('foo'),
-            $template = Template::of('/foo'),
             Method::post,
+            $template = Template::of('/foo'),
         );
 
         $this->assertSame($name, $route->name());

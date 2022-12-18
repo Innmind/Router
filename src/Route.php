@@ -16,16 +16,16 @@ final class Route
     private Template $template;
     private Method $method;
 
-    public function __construct(Name $name, Template $template, Method $method)
+    private function __construct(Name $name, Method $method, Template $template)
     {
         $this->name = $name;
-        $this->template = $template;
         $this->method = $method;
+        $this->template = $template;
     }
 
     public static function of(Name $name, Method $method, Template $template): self
     {
-        return new self($name, $template, $method);
+        return new self($name, $method, $template);
     }
 
     public function name(): Name
