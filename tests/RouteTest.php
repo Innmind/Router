@@ -11,12 +11,21 @@ use Innmind\UrlTemplate\Template;
 use Innmind\Http\{
     Message\ServerRequest,
     Message\Method,
+    Message\StatusCode,
+    Message\Response,
+    ProtocolVersion,
 };
 use Innmind\Url\Url;
 use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\{
+    PHPUnit\BlackBox,
+    Set,
+};
 
 class RouteTest extends TestCase
 {
+    use BlackBox;
+
     public function testInterface()
     {
         $route = Route::of(
@@ -57,5 +66,44 @@ class RouteTest extends TestCase
 
         $this->assertFalse($route->matches($request));
         $this->assertTrue($route->matches($request));
+    }
+
+    public function testRespondToWithOkResponseByDefault()
+    {
+        $this
+            ->forAll(Set\Elements::of(...ProtocolVersion::cases()))
+            ->then(function($protocol) {
+                $route = Route::of(Name::of('foo'), Method::post, Template::of('/foo{+bar}'));
+                $request = $this->createMock(ServerRequest::class);
+                $request
+                    ->expects($this->once())
+                    ->method('protocolVersion')
+                    ->willReturn($protocol);
+
+                $response = $route->respondTo($request);
+
+                $this->assertSame(StatusCode::ok, $response->statusCode());
+                $this->assertSame($protocol, $response->protocolVersion());
+                $this->assertEmpty($response->body()->toString());
+            });
+    }
+
+    public function testRespondTo()
+    {
+        $this
+            ->forAll(Set\Elements::of(...ProtocolVersion::cases()))
+            ->then(function($protocol) {
+                $request = $this->createMock(ServerRequest::class);
+                $expected = $this->createMock(Response::class);
+                $route = Route::of(Name::of('foo'), Method::post, Template::of('/foo{+bar}'))->handle(
+                    function($serverRequest) use ($request, $expected) {
+                        $this->assertSame($request, $serverRequest);
+
+                        return $expected;
+                    },
+                );
+
+                $this->assertSame($expected, $route->respondTo($request));
+            });
     }
 }
