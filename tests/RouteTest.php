@@ -79,6 +79,10 @@ class RouteTest extends TestCase
                     ->expects($this->once())
                     ->method('protocolVersion')
                     ->willReturn($protocol);
+                $request
+                    ->expects($this->once())
+                    ->method('url')
+                    ->willReturn(Url::of('/foo/somedata'));
 
                 $response = $route->respondTo($request);
 
@@ -94,10 +98,15 @@ class RouteTest extends TestCase
             ->forAll(Set\Elements::of(...ProtocolVersion::cases()))
             ->then(function($protocol) {
                 $request = $this->createMock(ServerRequest::class);
+                $request
+                    ->expects($this->once())
+                    ->method('url')
+                    ->willReturn(Url::of('/foo/somedata'));
                 $expected = $this->createMock(Response::class);
                 $route = Route::of(Method::post, Template::of('/foo{+bar}'))->handle(
-                    function($serverRequest) use ($request, $expected) {
+                    function($serverRequest, $variables) use ($request, $expected) {
                         $this->assertSame($request, $serverRequest);
+                        $this->assertSame('/somedata', $variables->get('bar'));
 
                         return $expected;
                     },

@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Router;
 
-use Innmind\Router\Route\Name;
+use Innmind\Router\Route\{
+    Name,
+    Variables,
+};
 use Innmind\UrlTemplate\Template;
 use Innmind\Http\Message\{
     ServerRequest,
@@ -11,6 +14,7 @@ use Innmind\Http\Message\{
     Response,
     StatusCode,
 };
+use Innmind\Url\Url;
 use Innmind\Immutable\Maybe;
 
 /**
@@ -22,12 +26,12 @@ final class Route
     private Maybe $name;
     private Template $template;
     private Method $method;
-    /** @var callable(ServerRequest): Response */
+    /** @var callable(ServerRequest, Variables): Response */
     private $handler;
 
     /**
      * @param Maybe<Name> $name
-     * @param callable(ServerRequest): Response $handler
+     * @param callable(ServerRequest, Variables): Response $handler
      */
     private function __construct(
         Maybe $name,
@@ -84,7 +88,7 @@ final class Route
     }
 
     /**
-     * @param callable(ServerRequest): Response $handler
+     * @param callable(ServerRequest, Variables): Response $handler
      */
     public function handle(callable $handler): self
     {
@@ -102,17 +106,23 @@ final class Route
             return false;
         }
 
-        return $this->template->matches(
-            $request
-                ->url()
-                ->withoutScheme()
-                ->withoutAuthority(),
-        );
+        return $this->template->matches($this->url($request));
     }
 
     public function respondTo(ServerRequest $request): Response
     {
         /** @psalm-suppress ImpureFunctionCall For real apps the handler can't really be pure */
-        return ($this->handler)($request);
+        return ($this->handler)(
+            $request,
+            Variables::of($this->template->extract($this->url($request))),
+        );
+    }
+
+    private function url(ServerRequest $request): Url
+    {
+        return $request
+            ->url()
+            ->withoutScheme()
+            ->withoutAuthority();
     }
 }
