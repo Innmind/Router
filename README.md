@@ -15,23 +15,38 @@ composer require innmind/router
 ## Usage
 
 ```php
-use function Innmind\Router\bootstrap;
-use Innmind\Router\Route\Name;
-use Innmind\Url\{
-    Url,
-    Path,
+use Innmind\Router\{
+    Route,
+    Route\Name,
+    RequestMatcher\RequestMatcher,
+    UrlGenerator\UrlGenerator,
+};
+use Innmind\Http\Message\{
+    Method,
+    ServerRequest,
+};
+use Innmind\UrlTemplate\Template;
+use Innmind\Url\Url;
+use Innmind\Immutable\{
+    Sequence,
+    Maybe,
 };
 
-$router = bootstrap(
-    new Path('/to/routes/definitions.yml')
+$routes = Sequence::of(
+    Route::of(
+        Name::of('routeName'),
+        Method::post,
+        Template::of('/url{/template}'),
+    ),
+    Route::of(
+        Name::of('anotherRoute'),
+        Method::delete,
+        Template::of('/resource/{id}'),
+    ),
 );
-$route = $router['requestMatcher']($serverRequest); // Route or throws NoMatchingRouteFound
-$router['urlGenerator'](new Name('routeName')); // Url
-```
 
-The routes definitions must look like this:
-
-```yaml
-routeName: POST /url{/template}
-anotherRoute: DELETE /resource/{id}
+$requestMatcher = new RequestMatcher($routes);
+$route = $requestMatcher(/* instance of ServerRequest */); // Maybe<Route>
+$urlGenerator = new UrlGenerator($routes);
+$urlGenerator(Name::of('routeName')); // Url or throws NoMatchingRouteFound
 ```
