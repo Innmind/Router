@@ -15,23 +15,113 @@ composer require innmind/router
 ## Usage
 
 ```php
-use function Innmind\Router\bootstrap;
-use Innmind\Router\Route\Name;
-use Innmind\Url\{
-    Url,
-    Path,
+use Innmind\Router\{
+    Route,
+    Route\Name,
+    RequestMatcher\RequestMatcher,
+    UrlGenerator\UrlGenerator,
+};
+use Innmind\Http\Message\{
+    Method,
+    ServerRequest,
+};
+use Innmind\UrlTemplate\Template;
+use Innmind\Url\Url;
+use Innmind\Immutable\{
+    Sequence,
+    Maybe,
 };
 
-$router = bootstrap(
-    new Path('/to/routes/definitions.yml')
+$routes = Sequence::of(
+    Route::of(
+        Method::post,
+        Template::of('/url{/template}'),
+    )->named(Name::of('routeName')),
+    Route::of(
+        Method::delete,
+        Template::of('/resource/{id}'),
+    )->named(Name::of('anotherRoute')),
 );
-$route = $router['requestMatcher']($serverRequest); // Route or throws NoMatchingRouteFound
-$router['urlGenerator'](new Name('routeName')); // Url
+
+$requestMatcher = new RequestMatcher($routes);
+$route = $requestMatcher(/* instance of ServerRequest */); // Maybe<Route>
+$urlGenerator = new UrlGenerator($routes);
+$urlGenerator(Name::of('routeName')); // Url or throws NoMatchingRouteFound
 ```
 
-The routes definitions must look like this:
+### Building a simple app
 
-```yaml
-routeName: POST /url{/template}
-anotherRoute: DELETE /resource/{id}
+Example using the `innmind/http-server` package to respond with files stored in a private folder.
+
+```php
+use Innmind\Router\{
+    Route,
+    RequestMatcher\RequestMatcher,
+};
+use Innmind\HttpServer\Main;
+use Innmind\OperatingSystem\OperatingSystem;
+use Innmind\Http\{
+    Message\Method,
+    Message\ServerRequest,
+    Message\Response\Response,
+    Message\StatusCode,
+};
+use Innmind\Filesystem\Name;
+use Innmind\UrlTemplate\Template;
+use Innmind\Url\Path;
+
+new class extends Main {
+    private RequestMatcher $router;
+
+    protected function preload(OperatingSystem $os): void
+    {
+        $routes = Sequence::of(
+            Route::of(Method::get, Template::of('/image/{name}'))->handle(
+                fn($request, $variables) => $this->loadFile(
+                    $os,
+                    $variables->get('name'),
+                ),
+            ),
+            Route::of(Method::get, Template::of('/image/random'))->handle(
+                fn($request) => $this->loadFile(
+                    $os,
+                    generateRandomName(),
+                ),
+            ),
+        );
+
+        $this->router = new RequestMatcher($routes);
+    }
+
+    protected function main(ServerRequest $request): Response
+    {
+        return ($this->router)($request)->match(
+            static fn($route) => $route->respondTo($request),
+            static fn() => new Response(
+                StatusCode::notFound,
+                $request->protocolVersion(),
+            ),
+        );
+    }
+
+    private function loadFile(OperatingSystem $os, string $name): Response
+    {
+        return $os
+            ->filesystem()
+            ->mount(Path::of('some/private/folder/'))
+            ->get(Name::of($name))
+            ->match(
+                static fn($file) => new Response(
+                    StatusCode::ok,
+                    $request->protocolVersion(),
+                    null,
+                    $file->content(),
+                ),
+                static fn() => new Response(
+                    StatusCode::notFound,
+                    $request->protocolVersion(),
+                ),
+            );
+    }
+}
 ```

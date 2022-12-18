@@ -8,17 +8,14 @@ use Innmind\Router\{
     RequestMatcher as RequestMatcherInterface,
     Route,
     Route\Name,
-    Exception\NoMatchingRouteFound,
 };
 use Innmind\Http\Message\{
     ServerRequest,
     Method,
 };
+use Innmind\UrlTemplate\Template;
 use Innmind\Url\Url;
-use Innmind\Immutable\{
-    Set,
-    Str,
-};
+use Innmind\Immutable\Sequence;
 use PHPUnit\Framework\TestCase;
 
 class RequestMatcherTest extends TestCase
@@ -27,62 +24,56 @@ class RequestMatcherTest extends TestCase
     {
         $this->assertInstanceOf(
             RequestMatcherInterface::class,
-            new RequestMatcher(Set::of(Route::class))
+            new RequestMatcher(Sequence::of()),
         );
-    }
-
-    public function testThrowWhenInvalidRouteSet()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Set<Innmind\Router\Route>');
-
-        new RequestMatcher(Set::of('string'));
     }
 
     public function testInvokation()
     {
         $match = new RequestMatcher(
-            Set::of(
-                Route::class,
-                Route::of(new Name('baz'), Str::of('DELETE /foo')),
-                $route = Route::of(new Name('foo'), Str::of('POST /foo')),
-                Route::of(new Name('bar'), Str::of('GET /foo'))
-            )
+            Sequence::of(
+                Route::of(Method::delete, Template::of('/foo')),
+                $route = Route::of(Method::post, Template::of('/foo')),
+                Route::of(Method::get, Template::of('/foo')),
+            ),
         );
         $request = $this->createMock(ServerRequest::class);
         $request
             ->expects($this->exactly(2))
             ->method('method')
-            ->willReturn(Method::post());
+            ->willReturn(Method::post);
         $request
             ->expects($this->once())
             ->method('url')
             ->willReturn(Url::of('/foo'));
 
-        $this->assertSame($route, $match($request));
+        $this->assertSame($route, $match($request)->match(
+            static fn($route) => $route,
+            static fn() => null,
+        ));
     }
 
-    public function testThrowWhenNoMatchingRouteFound()
+    public function testReturnNothingWhenNoMatchingRouteFound()
     {
         $match = new RequestMatcher(
-            Set::of(
-                Route::class,
-                Route::of(new Name('baz'), Str::of('DELETE /foo')),
-                Route::of(new Name('foo'), Str::of('POST /foo')),
-                Route::of(new Name('bar'), Str::of('GET /foo'))
-            )
+            Sequence::of(
+                Route::of(Method::delete, Template::of('/foo')),
+                Route::of(Method::post, Template::of('/foo')),
+                Route::of(Method::get, Template::of('/foo')),
+            ),
         );
         $request = $this->createMock(ServerRequest::class);
         $request
             ->expects($this->exactly(3))
             ->method('method')
-            ->willReturn(Method::put());
+            ->willReturn(Method::put);
         $request
             ->expects($this->never())
             ->method('url');
 
-        $this->expectException(NoMatchingRouteFound::class);
-
-        $match($request);
+        $this->assertNull($match($request)->match(
+            static fn($route) => $route,
+            static fn() => null,
+        ));
     }
 }

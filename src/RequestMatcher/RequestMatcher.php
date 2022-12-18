@@ -6,38 +6,28 @@ namespace Innmind\Router\RequestMatcher;
 use Innmind\Router\{
     RequestMatcher as RequestMatcherInterface,
     Route,
-    Exception\NoMatchingRouteFound,
 };
 use Innmind\Http\Message\ServerRequest;
 use Innmind\Immutable\{
-    Set,
-    Exception\NoElementMatchingPredicateFound,
+    Sequence,
+    Maybe,
 };
-use function Innmind\Immutable\assertSet;
 
 final class RequestMatcher implements RequestMatcherInterface
 {
-    /** @var Set<Route> */
-    private Set $routes;
+    /** @var Sequence<Route> */
+    private Sequence $routes;
 
     /**
-     * @param Set<Route> $routes
+     * @param Sequence<Route> $routes
      */
-    public function __construct(Set $routes)
+    public function __construct(Sequence $routes)
     {
-        assertSet(Route::class, $routes, 1);
-
         $this->routes = $routes;
     }
 
-    public function __invoke(ServerRequest $request): Route
+    public function __invoke(ServerRequest $request): Maybe
     {
-        try {
-            return $this->routes->find(
-                static fn(Route $route): bool => $route->matches($request),
-            );
-        } catch (NoElementMatchingPredicateFound $e) {
-            throw new NoMatchingRouteFound;
-        }
+        return $this->routes->find(static fn(Route $route): bool => $route->matches($request));
     }
 }

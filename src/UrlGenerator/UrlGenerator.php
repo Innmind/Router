@@ -7,38 +7,37 @@ use Innmind\Router\{
     UrlGenerator as UrlGeneratorInterface,
     Route,
     Route\Name,
+    Exception\NoMatchingRouteFound,
 };
 use Innmind\Url\Url;
 use Innmind\Immutable\{
     Map,
-    Set,
+    Sequence,
 };
-use function Innmind\Immutable\assertSet;
 
 final class UrlGenerator implements UrlGeneratorInterface
 {
-    /** @var Set<Route> */
-    private Set $routes;
+    /** @var Sequence<Route> */
+    private Sequence $routes;
 
     /**
-     * @param Set<Route> $routes
+     * @param Sequence<Route> $routes
      */
-    public function __construct(Set $routes)
+    public function __construct(Sequence $routes)
     {
-        assertSet(Route::class, $routes, 1);
-
         $this->routes = $routes;
     }
 
     public function __invoke(Name $route, Map $variables = null): Url
     {
-        /** @var Map<string, scalar|array> */
-        $default = Map::of('string', 'scalar|array');
-
         return $this
             ->routes
-            ->find(static fn(Route $candidate): bool => $candidate->name()->equals($route))
-            ->template()
-            ->expand($variables ?? $default);
+            ->find(static fn(Route $candidate): bool => $candidate->is($route))
+            ->map(static fn($route) => $route->template())
+            ->map(static fn($template) => $template->expand($variables ?? Map::of()))
+            ->match(
+                static fn($route) => $route,
+                static fn() => throw new NoMatchingRouteFound(),
+            );
     }
 }
