@@ -6,10 +6,12 @@ namespace Innmind\Router\RequestMatcher;
 use Innmind\Router\{
     RequestMatcher as RequestMatcherInterface,
     Route,
-    Exception\NoMatchingRouteFound,
 };
 use Innmind\Http\Message\ServerRequest;
-use Innmind\Immutable\Set;
+use Innmind\Immutable\{
+    Set,
+    Maybe,
+};
 
 final class RequestMatcher implements RequestMatcherInterface
 {
@@ -24,14 +26,8 @@ final class RequestMatcher implements RequestMatcherInterface
         $this->routes = $routes;
     }
 
-    public function __invoke(ServerRequest $request): Route
+    public function __invoke(ServerRequest $request): Maybe
     {
-        return $this
-            ->routes
-            ->find(static fn(Route $route): bool => $route->matches($request))
-            ->match(
-                static fn($route) => $route,
-                static fn() => throw new NoMatchingRouteFound,
-            );
+        return $this->routes->find(static fn(Route $route): bool => $route->matches($request));
     }
 }

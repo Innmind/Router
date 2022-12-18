@@ -8,7 +8,6 @@ use Innmind\Router\{
     RequestMatcher as RequestMatcherInterface,
     Route,
     Route\Name,
-    Exception\NoMatchingRouteFound,
 };
 use Innmind\Http\Message\{
     ServerRequest,
@@ -50,10 +49,13 @@ class RequestMatcherTest extends TestCase
             ->method('url')
             ->willReturn(Url::of('/foo'));
 
-        $this->assertSame($route, $match($request));
+        $this->assertSame($route, $match($request)->match(
+            static fn($route) => $route,
+            static fn() => null,
+        ));
     }
 
-    public function testThrowWhenNoMatchingRouteFound()
+    public function testReturnNothingWhenNoMatchingRouteFound()
     {
         $match = new RequestMatcher(
             Set::of(
@@ -71,8 +73,9 @@ class RequestMatcherTest extends TestCase
             ->expects($this->never())
             ->method('url');
 
-        $this->expectException(NoMatchingRouteFound::class);
-
-        $match($request);
+        $this->assertNull($match($request)->match(
+            static fn($route) => $route,
+            static fn() => null,
+        ));
     }
 }
