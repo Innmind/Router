@@ -6,6 +6,9 @@ namespace Innmind\Router\Route;
 use Innmind\Router\Exception\DomainException;
 use Innmind\Immutable\Str;
 
+/**
+ * @psalm-immutable
+ */
 final class Name
 {
     private string $value;
@@ -20,6 +23,8 @@ final class Name
     }
 
     /**
+     * @psalm-pure
+     *
      * @param literal-string $value
      *
      * @throws DomainException

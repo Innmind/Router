@@ -10,6 +10,9 @@ use Innmind\Http\Message\{
     Method,
 };
 
+/**
+ * @psalm-immutable
+ */
 final class Route
 {
     private Name $name;
@@ -23,6 +26,9 @@ final class Route
         $this->template = $template;
     }
 
+    /**
+     * @psalm-pure
+     */
     public static function of(Name $name, Method $method, Template $template): self
     {
         return new self($name, $method, $template);
