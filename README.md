@@ -96,7 +96,7 @@ new class extends Main {
     protected function main(ServerRequest $request): Response
     {
         return ($this->router)($request)->match(
-            static fn($response) => $response,
+            static fn($route) => $route->respondTo($request),
             static fn() => new Response(
                 StatusCode::notFound,
                 $request->protocolVersion(),
