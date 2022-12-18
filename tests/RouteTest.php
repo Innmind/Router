@@ -13,7 +13,6 @@ use Innmind\Http\{
     Message\Method,
 };
 use Innmind\Url\Url;
-use Innmind\Immutable\Str;
 use PHPUnit\Framework\TestCase;
 
 class RouteTest extends TestCase
@@ -32,7 +31,7 @@ class RouteTest extends TestCase
 
     public function testOf()
     {
-        $route = Route::of(new Name('foo'), Str::of('POST /foo/bar'));
+        $route = Route::of(new Name('foo'), Method::post, Template::of('/foo/bar'));
 
         $this->assertInstanceOf(Route::class, $route);
         $this->assertSame('foo', $route->name()->toString());
@@ -41,7 +40,7 @@ class RouteTest extends TestCase
 
     public function testMatches()
     {
-        $route = Route::of(new Name('foo'), Str::of('POST /foo{+bar}'));
+        $route = Route::of(new Name('foo'), Method::post, Template::of('/foo{+bar}'));
 
         $request = $this->createMock(ServerRequest::class);
         $request

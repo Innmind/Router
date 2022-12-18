@@ -9,6 +9,8 @@ use Innmind\Router\{
     Route,
     Route\Name,
 };
+use Innmind\Http\Message\Method;
+use Innmind\UrlTemplate\Template;
 use Innmind\Url\Url;
 use Innmind\Immutable\{
     Sequence,
@@ -31,11 +33,11 @@ class UrlGeneratorTest extends TestCase
     {
         $generate = new UrlGenerator(
             Sequence::of(
-                Route::of(new Name('create'), Str::of('POST /resource')),
-                Route::of(new Name('list'), Str::of('GET /resource')),
-                Route::of(new Name('read'), Str::of('GET /resource/{id}')),
-                Route::of(new Name('update'), Str::of('PUT /resource/{id}')),
-                Route::of(new Name('delete'), Str::of('DELETE /resource/{id}')),
+                Route::of(new Name('create'), Method::post, Template::of('/resource')),
+                Route::of(new Name('list'), Method::get, Template::of('/resource')),
+                Route::of(new Name('read'), Method::get, Template::of('/resource/{id}')),
+                Route::of(new Name('update'), Method::put, Template::of('/resource/{id}')),
+                Route::of(new Name('delete'), Method::delete, Template::of('/resource/{id}')),
             ),
         );
 

@@ -13,11 +13,9 @@ use Innmind\Http\Message\{
     ServerRequest,
     Method,
 };
+use Innmind\UrlTemplate\Template;
 use Innmind\Url\Url;
-use Innmind\Immutable\{
-    Sequence,
-    Str,
-};
+use Innmind\Immutable\Sequence;
 use PHPUnit\Framework\TestCase;
 
 class RequestMatcherTest extends TestCase
@@ -34,9 +32,9 @@ class RequestMatcherTest extends TestCase
     {
         $match = new RequestMatcher(
             Sequence::of(
-                Route::of(new Name('baz'), Str::of('DELETE /foo')),
-                $route = Route::of(new Name('foo'), Str::of('POST /foo')),
-                Route::of(new Name('bar'), Str::of('GET /foo')),
+                Route::of(new Name('baz'), Method::delete, Template::of('/foo')),
+                $route = Route::of(new Name('foo'), Method::post, Template::of('/foo')),
+                Route::of(new Name('bar'), Method::get, Template::of('/foo')),
             ),
         );
         $request = $this->createMock(ServerRequest::class);
@@ -59,9 +57,9 @@ class RequestMatcherTest extends TestCase
     {
         $match = new RequestMatcher(
             Sequence::of(
-                Route::of(new Name('baz'), Str::of('DELETE /foo')),
-                Route::of(new Name('foo'), Str::of('POST /foo')),
-                Route::of(new Name('bar'), Str::of('GET /foo')),
+                Route::of(new Name('baz'), Method::delete, Template::of('/foo')),
+                Route::of(new Name('foo'), Method::post, Template::of('/foo')),
+                Route::of(new Name('bar'), Method::get, Template::of('/foo')),
             ),
         );
         $request = $this->createMock(ServerRequest::class);

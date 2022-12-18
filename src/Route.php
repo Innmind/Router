@@ -9,7 +9,6 @@ use Innmind\Http\Message\{
     ServerRequest,
     Method,
 };
-use Innmind\Immutable\Str;
 
 final class Route
 {
@@ -24,15 +23,9 @@ final class Route
         $this->method = $method;
     }
 
-    public static function of(Name $name, Str $pattern): self
+    public static function of(Name $name, Method $method, Template $template): self
     {
-        [$method, $template] = $pattern->split(' ')->toList();
-
-        return new self(
-            $name,
-            Template::of($template->toString()),
-            Method::of($method->toUpper()->toString()),
-        );
+        return new self($name, $template, $method);
     }
 
     public function name(): Name
