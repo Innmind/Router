@@ -22,7 +22,7 @@ class NameTest extends TestCase
         $this
             ->forAll(Set\Strings::any()->filter(static fn($value) => $value !== ''))
             ->then(function(string $value): void {
-                $this->assertSame($value, (new Name($value))->toString());
+                $this->assertSame($value, Name::of($value)->toString());
             });
     }
 
@@ -37,9 +37,9 @@ class NameTest extends TestCase
                 return $a !== $b;
             })
             ->then(function($a, $b): void {
-                $this->assertTrue((new Name($a))->equals(new Name($a)));
-                $this->assertFalse((new Name($a))->equals(new Name($b)));
-                $this->assertFalse((new Name($b))->equals(new Name($a)));
+                $this->assertTrue(Name::of($a)->equals(Name::of($a)));
+                $this->assertFalse(Name::of($a)->equals(Name::of($b)));
+                $this->assertFalse(Name::of($b)->equals(Name::of($a)));
             });
     }
 
@@ -47,6 +47,6 @@ class NameTest extends TestCase
     {
         $this->expectException(DomainException::class);
 
-        new Name('');
+        Name::of('');
     }
 }

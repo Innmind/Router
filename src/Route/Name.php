@@ -10,13 +10,23 @@ final class Name
 {
     private string $value;
 
-    public function __construct(string $value)
+    private function __construct(string $value)
     {
         if (Str::of($value)->empty()) {
             throw new DomainException;
         }
 
         $this->value = $value;
+    }
+
+    /**
+     * @param literal-string $value
+     *
+     * @throws DomainException
+     */
+    public static function of(string $value): self
+    {
+        return new self($value);
     }
 
     public function equals(self $route): bool

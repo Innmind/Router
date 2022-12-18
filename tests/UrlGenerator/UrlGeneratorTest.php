@@ -33,41 +33,41 @@ class UrlGeneratorTest extends TestCase
     {
         $generate = new UrlGenerator(
             Sequence::of(
-                Route::of(new Name('create'), Method::post, Template::of('/resource')),
-                Route::of(new Name('list'), Method::get, Template::of('/resource')),
-                Route::of(new Name('read'), Method::get, Template::of('/resource/{id}')),
-                Route::of(new Name('update'), Method::put, Template::of('/resource/{id}')),
-                Route::of(new Name('delete'), Method::delete, Template::of('/resource/{id}')),
+                Route::of(Name::of('create'), Method::post, Template::of('/resource')),
+                Route::of(Name::of('list'), Method::get, Template::of('/resource')),
+                Route::of(Name::of('read'), Method::get, Template::of('/resource/{id}')),
+                Route::of(Name::of('update'), Method::put, Template::of('/resource/{id}')),
+                Route::of(Name::of('delete'), Method::delete, Template::of('/resource/{id}')),
             ),
         );
 
-        $this->assertInstanceOf(Url::class, $generate(new Name('create')));
+        $this->assertInstanceOf(Url::class, $generate(Name::of('create')));
         $this->assertSame(
             '/resource',
-            $generate(new Name('create'))->toString(),
+            $generate(Name::of('create'))->toString(),
         );
         $this->assertSame(
             '/resource',
-            $generate(new Name('list'))->toString(),
+            $generate(Name::of('list'))->toString(),
         );
         $this->assertSame(
             '/resource/ecdd5bdc-943e-4a4f-8d16-255892bcacaa',
             $generate(
-                new Name('read'),
+                Name::of('read'),
                 Map::of(['id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa']),
             )->toString(),
         );
         $this->assertSame(
             '/resource/ecdd5bdc-943e-4a4f-8d16-255892bcacaa',
             $generate(
-                new Name('update'),
+                Name::of('update'),
                 Map::of(['id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa']),
             )->toString(),
         );
         $this->assertSame(
             '/resource/ecdd5bdc-943e-4a4f-8d16-255892bcacaa',
             $generate(
-                new Name('delete'),
+                Name::of('delete'),
                 Map::of(['id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa']),
             )->toString(),
         );

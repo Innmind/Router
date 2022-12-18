@@ -20,7 +20,7 @@ class RouteTest extends TestCase
     public function testInterface()
     {
         $route = Route::of(
-            $name = new Name('foo'),
+            $name = Name::of('foo'),
             Method::post,
             $template = Template::of('/foo'),
         );
@@ -31,7 +31,7 @@ class RouteTest extends TestCase
 
     public function testOf()
     {
-        $route = Route::of(new Name('foo'), Method::post, Template::of('/foo/bar'));
+        $route = Route::of(Name::of('foo'), Method::post, Template::of('/foo/bar'));
 
         $this->assertInstanceOf(Route::class, $route);
         $this->assertSame('foo', $route->name()->toString());
@@ -40,7 +40,7 @@ class RouteTest extends TestCase
 
     public function testMatches()
     {
-        $route = Route::of(new Name('foo'), Method::post, Template::of('/foo{+bar}'));
+        $route = Route::of(Name::of('foo'), Method::post, Template::of('/foo{+bar}'));
 
         $request = $this->createMock(ServerRequest::class);
         $request
