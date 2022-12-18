@@ -15,7 +15,7 @@ use Innmind\Http\Message\{
 };
 use Innmind\Url\Url;
 use Innmind\Immutable\{
-    Set,
+    Sequence,
     Str,
 };
 use PHPUnit\Framework\TestCase;
@@ -26,14 +26,14 @@ class RequestMatcherTest extends TestCase
     {
         $this->assertInstanceOf(
             RequestMatcherInterface::class,
-            new RequestMatcher(Set::of(Route::class)),
+            new RequestMatcher(Sequence::of()),
         );
     }
 
     public function testInvokation()
     {
         $match = new RequestMatcher(
-            Set::of(
+            Sequence::of(
                 Route::of(new Name('baz'), Str::of('DELETE /foo')),
                 $route = Route::of(new Name('foo'), Str::of('POST /foo')),
                 Route::of(new Name('bar'), Str::of('GET /foo')),
@@ -58,7 +58,7 @@ class RequestMatcherTest extends TestCase
     public function testReturnNothingWhenNoMatchingRouteFound()
     {
         $match = new RequestMatcher(
-            Set::of(
+            Sequence::of(
                 Route::of(new Name('baz'), Str::of('DELETE /foo')),
                 Route::of(new Name('foo'), Str::of('POST /foo')),
                 Route::of(new Name('bar'), Str::of('GET /foo')),

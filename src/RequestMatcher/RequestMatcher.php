@@ -9,19 +9,19 @@ use Innmind\Router\{
 };
 use Innmind\Http\Message\ServerRequest;
 use Innmind\Immutable\{
-    Set,
+    Sequence,
     Maybe,
 };
 
 final class RequestMatcher implements RequestMatcherInterface
 {
-    /** @var Set<Route> */
-    private Set $routes;
+    /** @var Sequence<Route> */
+    private Sequence $routes;
 
     /**
-     * @param Set<Route> $routes
+     * @param Sequence<Route> $routes
      */
-    public function __construct(Set $routes)
+    public function __construct(Sequence $routes)
     {
         $this->routes = $routes;
     }

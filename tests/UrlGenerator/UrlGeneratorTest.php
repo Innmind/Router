@@ -11,7 +11,7 @@ use Innmind\Router\{
 };
 use Innmind\Url\Url;
 use Innmind\Immutable\{
-    Set,
+    Sequence,
     Str,
     Map,
 };
@@ -23,14 +23,14 @@ class UrlGeneratorTest extends TestCase
     {
         $this->assertInstanceOf(
             UrlGeneratorInterface::class,
-            new UrlGenerator(Set::of(Route::class)),
+            new UrlGenerator(Sequence::of()),
         );
     }
 
     public function testInvokation()
     {
         $generate = new UrlGenerator(
-            Set::of(
+            Sequence::of(
                 Route::of(new Name('create'), Str::of('POST /resource')),
                 Route::of(new Name('list'), Str::of('GET /resource')),
                 Route::of(new Name('read'), Str::of('GET /resource/{id}')),

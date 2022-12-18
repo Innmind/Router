@@ -12,18 +12,18 @@ use Innmind\Router\{
 use Innmind\Url\Url;
 use Innmind\Immutable\{
     Map,
-    Set,
+    Sequence,
 };
 
 final class UrlGenerator implements UrlGeneratorInterface
 {
-    /** @var Set<Route> */
-    private Set $routes;
+    /** @var Sequence<Route> */
+    private Sequence $routes;
 
     /**
-     * @param Set<Route> $routes
+     * @param Sequence<Route> $routes
      */
-    public function __construct(Set $routes)
+    public function __construct(Sequence $routes)
     {
         $this->routes = $routes;
     }
