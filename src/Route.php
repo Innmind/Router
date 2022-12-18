@@ -40,7 +40,7 @@ final class Route
 
     public function matches(ServerRequest $request): bool
     {
-        if ($request->method()->toString() !== $this->method->toString()) {
+        if ($request->method() !== $this->method) {
             return false;
         }
 
