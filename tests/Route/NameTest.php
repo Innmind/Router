@@ -31,7 +31,7 @@ class NameTest extends TestCase
         $this
             ->forAll(
                 Set\Strings::any()->filter(static fn($value) => $value !== ''),
-                Set\Strings::any()->filter(static fn($value) => $value !== '')
+                Set\Strings::any()->filter(static fn($value) => $value !== ''),
             )
             ->filter(static function($a, $b): bool {
                 return $a !== $b;

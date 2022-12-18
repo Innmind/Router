@@ -27,7 +27,7 @@ class RequestMatcherTest extends TestCase
     {
         $this->assertInstanceOf(
             RequestMatcherInterface::class,
-            new RequestMatcher(Set::of(Route::class))
+            new RequestMatcher(Set::of(Route::class)),
         );
     }
 
@@ -46,8 +46,8 @@ class RequestMatcherTest extends TestCase
                 Route::class,
                 Route::of(new Name('baz'), Str::of('DELETE /foo')),
                 $route = Route::of(new Name('foo'), Str::of('POST /foo')),
-                Route::of(new Name('bar'), Str::of('GET /foo'))
-            )
+                Route::of(new Name('bar'), Str::of('GET /foo')),
+            ),
         );
         $request = $this->createMock(ServerRequest::class);
         $request
@@ -69,8 +69,8 @@ class RequestMatcherTest extends TestCase
                 Route::class,
                 Route::of(new Name('baz'), Str::of('DELETE /foo')),
                 Route::of(new Name('foo'), Str::of('POST /foo')),
-                Route::of(new Name('bar'), Str::of('GET /foo'))
-            )
+                Route::of(new Name('bar'), Str::of('GET /foo')),
+            ),
         );
         $request = $this->createMock(ServerRequest::class);
         $request

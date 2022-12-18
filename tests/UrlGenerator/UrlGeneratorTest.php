@@ -23,7 +23,7 @@ class UrlGeneratorTest extends TestCase
     {
         $this->assertInstanceOf(
             UrlGeneratorInterface::class,
-            new UrlGenerator(Set::of(Route::class))
+            new UrlGenerator(Set::of(Route::class)),
         );
     }
 
@@ -44,8 +44,8 @@ class UrlGeneratorTest extends TestCase
                 Route::of(new Name('list'), Str::of('GET /resource')),
                 Route::of(new Name('read'), Str::of('GET /resource/{id}')),
                 Route::of(new Name('update'), Str::of('PUT /resource/{id}')),
-                Route::of(new Name('delete'), Str::of('DELETE /resource/{id}'))
-            )
+                Route::of(new Name('delete'), Str::of('DELETE /resource/{id}')),
+            ),
         );
 
         $this->assertInstanceOf(Url::class, $generate(new Name('create')));
@@ -62,7 +62,7 @@ class UrlGeneratorTest extends TestCase
             $generate(
                 new Name('read'),
                 Map::of('string', 'scalar|array')
-                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa')
+                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa'),
             )->toString(),
         );
         $this->assertSame(
@@ -70,7 +70,7 @@ class UrlGeneratorTest extends TestCase
             $generate(
                 new Name('update'),
                 Map::of('string', 'scalar|array')
-                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa')
+                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa'),
             )->toString(),
         );
         $this->assertSame(
@@ -78,7 +78,7 @@ class UrlGeneratorTest extends TestCase
             $generate(
                 new Name('delete'),
                 Map::of('string', 'scalar|array')
-                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa')
+                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa'),
             )->toString(),
         );
     }
