@@ -10,7 +10,6 @@ use Innmind\Http\Message\{
     Method,
 };
 use Innmind\Immutable\Str;
-use function Innmind\Immutable\unwrap;
 
 final class Route
 {
@@ -27,12 +26,12 @@ final class Route
 
     public static function of(Name $name, Str $pattern): self
     {
-        [$method, $template] = unwrap($pattern->split(' '));
+        [$method, $template] = $pattern->split(' ')->toList();
 
         return new self(
             $name,
             Template::of($template->toString()),
-            new Method($method->toUpper()->toString()),
+            Method::of($method->toUpper()->toString()),
         );
     }
 

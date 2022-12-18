@@ -31,19 +31,10 @@ class RequestMatcherTest extends TestCase
         );
     }
 
-    public function testThrowWhenInvalidRouteSet()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Set<Innmind\Router\Route>');
-
-        new RequestMatcher(Set::of('string'));
-    }
-
     public function testInvokation()
     {
         $match = new RequestMatcher(
             Set::of(
-                Route::class,
                 Route::of(new Name('baz'), Str::of('DELETE /foo')),
                 $route = Route::of(new Name('foo'), Str::of('POST /foo')),
                 Route::of(new Name('bar'), Str::of('GET /foo')),
@@ -53,7 +44,7 @@ class RequestMatcherTest extends TestCase
         $request
             ->expects($this->exactly(2))
             ->method('method')
-            ->willReturn(Method::post());
+            ->willReturn(Method::post);
         $request
             ->expects($this->once())
             ->method('url')
@@ -66,7 +57,6 @@ class RequestMatcherTest extends TestCase
     {
         $match = new RequestMatcher(
             Set::of(
-                Route::class,
                 Route::of(new Name('baz'), Str::of('DELETE /foo')),
                 Route::of(new Name('foo'), Str::of('POST /foo')),
                 Route::of(new Name('bar'), Str::of('GET /foo')),
@@ -76,7 +66,7 @@ class RequestMatcherTest extends TestCase
         $request
             ->expects($this->exactly(3))
             ->method('method')
-            ->willReturn(Method::put());
+            ->willReturn(Method::put);
         $request
             ->expects($this->never())
             ->method('url');

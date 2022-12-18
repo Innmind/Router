@@ -10,7 +10,7 @@ use Innmind\Immutable\Map;
 interface UrlGenerator
 {
     /**
-     * @param Map<string, scalar|array> $variables
+     * @param ?Map<non-empty-string, string|list<string>|list<array{string, string}>> $variables
      */
     public function __invoke(Name $route, Map $variables = null): Url;
 }

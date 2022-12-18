@@ -23,7 +23,7 @@ class RouteTest extends TestCase
         $route = new Route(
             $name = new Name('foo'),
             $template = Template::of('/foo'),
-            Method::post(),
+            Method::post,
         );
 
         $this->assertSame($name, $route->name());
@@ -48,8 +48,8 @@ class RouteTest extends TestCase
             ->expects($this->exactly(2))
             ->method('method')
             ->will($this->onConsecutiveCalls(
-                Method::get(),
-                Method::post(),
+                Method::get,
+                Method::post,
             ));
         $request
             ->expects($this->once())

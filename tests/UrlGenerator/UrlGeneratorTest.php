@@ -27,19 +27,10 @@ class UrlGeneratorTest extends TestCase
         );
     }
 
-    public function testThrowWhenInvalidRouteSet()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Set<Innmind\Router\Route>');
-
-        new UrlGenerator(Set::of('string'));
-    }
-
     public function testInvokation()
     {
         $generate = new UrlGenerator(
             Set::of(
-                Route::class,
                 Route::of(new Name('create'), Str::of('POST /resource')),
                 Route::of(new Name('list'), Str::of('GET /resource')),
                 Route::of(new Name('read'), Str::of('GET /resource/{id}')),
@@ -61,24 +52,21 @@ class UrlGeneratorTest extends TestCase
             '/resource/ecdd5bdc-943e-4a4f-8d16-255892bcacaa',
             $generate(
                 new Name('read'),
-                Map::of('string', 'scalar|array')
-                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa'),
+                Map::of(['id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa']),
             )->toString(),
         );
         $this->assertSame(
             '/resource/ecdd5bdc-943e-4a4f-8d16-255892bcacaa',
             $generate(
                 new Name('update'),
-                Map::of('string', 'scalar|array')
-                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa'),
+                Map::of(['id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa']),
             )->toString(),
         );
         $this->assertSame(
             '/resource/ecdd5bdc-943e-4a4f-8d16-255892bcacaa',
             $generate(
                 new Name('delete'),
-                Map::of('string', 'scalar|array')
-                    ('id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa'),
+                Map::of(['id', 'ecdd5bdc-943e-4a4f-8d16-255892bcacaa']),
             )->toString(),
         );
     }
