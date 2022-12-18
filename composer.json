@@ -19,14 +19,12 @@
         "innmind/url": "~3.0",
         "innmind/immutable": "~3.3",
         "innmind/http": "~4.0",
-        "innmind/url-template": "~2.0",
-        "symfony/yaml": "^4.1|~5.0"
+        "innmind/url-template": "~2.0"
     },
     "autoload": {
         "psr-4": {
             "Innmind\\Router\\": "src/"
-        },
-        "files": ["src/bootstrap.php"]
+        }
     },
     "autoload-dev": {
         "psr-4": {
