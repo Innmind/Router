@@ -34,15 +34,13 @@ use Innmind\Immutable\{
 
 $routes = Sequence::of(
     Route::of(
-        Name::of('routeName'),
         Method::post,
         Template::of('/url{/template}'),
-    ),
+    )->named(Name::of('routeName')),
     Route::of(
-        Name::of('anotherRoute'),
         Method::delete,
         Template::of('/resource/{id}'),
-    ),
+    )->named(Name::of('anotherRoute')),
 );
 
 $requestMatcher = new RequestMatcher($routes);
@@ -78,21 +76,13 @@ new class extends Main {
     protected function preload(OperatingSystem $os): void
     {
         $routes = Sequence::of(
-            Route::of(
-                Route\Name::of('image'),
-                Method::get,
-                Template::of('/image/{name}'),
-            )->handle(
+            Route::of(Method::get, Template::of('/image/{name}'))->handle(
                 fn($request, $variables) => $this->loadFile(
                     $os,
                     $variables->get('name'),
                 ),
             ),
-            Route::of(
-                Route\Name::of('random'),
-                Method::get,
-                Template::of('/image/random'),
-            )->handle(
+            Route::of(Method::get, Template::of('/image/random'))->handle(
                 fn($request) => $this->loadFile(
                     $os,
                     generateRandomName(),
