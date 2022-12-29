@@ -6,6 +6,7 @@ namespace Tests\Innmind\Router;
 use Innmind\Router\{
     Route,
     Route\Name,
+    Exception\LogicException,
 };
 use Innmind\UrlTemplate\Template;
 use Innmind\Http\{
@@ -114,5 +115,51 @@ class RouteTest extends TestCase
 
                 $this->assertSame($expected, $route->respondTo($request));
             });
+    }
+
+    public function testLiteral()
+    {
+        $this
+            ->forAll(
+                Set\Elements::of(...Method::cases()),
+                Set\Elements::of('/foo', '/bar', '/'),
+            )
+            ->then(function($method, $url) {
+                $pattern = "{$method->toString()} $url";
+                $route = Route::literal($pattern);
+
+                $request = $this->createMock(ServerRequest::class);
+                $request
+                    ->expects($this->once())
+                    ->method('method')
+                    ->willReturn($method);
+                $request
+                    ->expects($this->once())
+                    ->method('url')
+                    ->willReturn(Url::of($url));
+
+                $this->assertTrue($route->matches($request));
+            });
+
+        $route = Route::literal('POST /foo');
+
+        $request = $this->createMock(ServerRequest::class);
+        $request
+            ->expects($this->once())
+            ->method('method')
+            ->willReturn(Method::post);
+        $request
+            ->expects($this->once())
+            ->method('url')
+            ->willReturn(Url::of('/bar'));
+
+        $this->assertFalse($route->matches($request));
+    }
+
+    public function testThrowWhenLiteralPatternIsInvalid()
+    {
+        $this->expectException(LogicException::class);
+
+        Route::literal('foo /');
     }
 }

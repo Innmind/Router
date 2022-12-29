@@ -3,9 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Router;
 
-use Innmind\Router\Route\{
-    Name,
-    Variables,
+use Innmind\Router\{
+    Route\Name,
+    Route\Variables,
+    Exception\LogicException,
 };
 use Innmind\UrlTemplate\Template;
 use Innmind\Http\Message\{
@@ -15,7 +16,10 @@ use Innmind\Http\Message\{
     StatusCode,
 };
 use Innmind\Url\Url;
-use Innmind\Immutable\Maybe;
+use Innmind\Immutable\{
+    Maybe,
+    Str,
+};
 
 /**
  * @psalm-immutable
@@ -62,6 +66,37 @@ final class Route
                 $request->protocolVersion(),
             ),
         );
+    }
+
+    /**
+     * @psalm-pure
+     *
+     * @param literal-string $pattern
+     *
+     * @throws LogicException If the pattern is invalid
+     */
+    public static function literal(string $pattern): self
+    {
+        $chunks = Str::of($pattern)->split(' ');
+
+        $method = $chunks
+            ->first()
+            ->map(static fn($method) => $method->toUpper()->toString())
+            ->flatMap(Method::maybe(...));
+        $template = Str::of(' ')
+            ->join(
+                $chunks
+                    ->drop(1)
+                    ->map(static fn($chunk) => $chunk->toString()),
+            )
+            ->toString();
+
+        return Maybe::all($method, Template::maybe($template))
+            ->map(self::of(...))
+            ->match(
+                static fn($self) => $self,
+                static fn() => throw new LogicException($pattern),
+            );
     }
 
     public function named(Name $name): self
