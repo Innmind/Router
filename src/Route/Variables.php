@@ -4,7 +4,10 @@ declare(strict_types = 1);
 namespace Innmind\Router\Route;
 
 use Innmind\Router\Exception\LogicException;
-use Innmind\Immutable\Map;
+use Innmind\Immutable\{
+    Map,
+    Maybe,
+};
 
 /**
  * @psalm-immutable
@@ -43,5 +46,13 @@ final class Variables
             static fn($value) => $value,
             static fn() => throw new LogicException($name),
         );
+    }
+
+    /**
+     * @return Maybe<string>
+     */
+    public function maybe(string $name): Maybe
+    {
+        return $this->values->get($name);
     }
 }
