@@ -7,7 +7,7 @@ use Innmind\Router\{
     RequestMatcher as RequestMatcherInterface,
     Route,
 };
-use Innmind\Http\Message\ServerRequest;
+use Innmind\Http\ServerRequest;
 use Innmind\Immutable\{
     Sequence,
     Maybe,

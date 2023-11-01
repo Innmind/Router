@@ -21,7 +21,7 @@ use Innmind\Router\{
     RequestMatcher\RequestMatcher,
     UrlGenerator\UrlGenerator,
 };
-use Innmind\Http\Message\{
+use Innmind\Http\{
     Method,
     ServerRequest,
 };
@@ -61,10 +61,10 @@ use Innmind\Router\{
 use Innmind\HttpServer\Main;
 use Innmind\OperatingSystem\OperatingSystem;
 use Innmind\Http\{
-    Message\Method,
-    Message\ServerRequest,
-    Message\Response\Response,
-    Message\StatusCode,
+    Method,
+    ServerRequest,
+    Response,
+    Response\StatusCode,
 };
 use Innmind\Filesystem\Name;
 use Innmind\UrlTemplate\Template;
@@ -97,7 +97,7 @@ new class extends Main {
     {
         return ($this->router)($request)->match(
             static fn($route) => $route->respondTo($request),
-            static fn() => new Response(
+            static fn() => Response::of(
                 StatusCode::notFound,
                 $request->protocolVersion(),
             ),
@@ -111,13 +111,13 @@ new class extends Main {
             ->mount(Path::of('some/private/folder/'))
             ->get(Name::of($name))
             ->match(
-                static fn($file) => new Response(
+                static fn($file) => Response::of(
                     StatusCode::ok,
                     $request->protocolVersion(),
                     null,
                     $file->content(),
                 ),
-                static fn() => new Response(
+                static fn() => Response::of(
                     StatusCode::notFound,
                     $request->protocolVersion(),
                 ),

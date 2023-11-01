@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.0 - 2023-11-01
+
+### Changed
+
+- Requires `innmind/http:~7.0`
+
 ## 3.4.0 - 2023-09-17
 
 ### Added

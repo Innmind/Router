@@ -10,10 +10,10 @@ use Innmind\Router\{
 };
 use Innmind\UrlTemplate\Template;
 use Innmind\Http\{
-    Message\ServerRequest,
-    Message\Method,
-    Message\StatusCode,
-    Message\Response,
+    ServerRequest,
+    Method,
+    Response,
+    Response\StatusCode,
     ProtocolVersion,
 };
 use Innmind\Url\Url;
@@ -52,21 +52,19 @@ class RouteTest extends TestCase
     {
         $route = Route::of(Method::post, Template::of('/foo{+bar}'));
 
-        $request = $this->createMock(ServerRequest::class);
-        $request
-            ->expects($this->exactly(2))
-            ->method('method')
-            ->will($this->onConsecutiveCalls(
-                Method::get,
-                Method::post,
-            ));
-        $request
-            ->expects($this->once())
-            ->method('url')
-            ->willReturn(Url::of('http://localhost:8000/foo/baz/bar'));
+        $request1 = ServerRequest::of(
+            Url::of('http://localhost:8000/foo/baz/bar'),
+            Method::get,
+            ProtocolVersion::v11,
+        );
+        $request2 = ServerRequest::of(
+            Url::of('http://localhost:8000/foo/baz/bar'),
+            Method::post,
+            ProtocolVersion::v11,
+        );
 
-        $this->assertFalse($route->matches($request));
-        $this->assertTrue($route->matches($request));
+        $this->assertFalse($route->matches($request1));
+        $this->assertTrue($route->matches($request2));
     }
 
     public function testRespondToWithOkResponseByDefault()
@@ -75,15 +73,11 @@ class RouteTest extends TestCase
             ->forAll(Set\Elements::of(...ProtocolVersion::cases()))
             ->then(function($protocol) {
                 $route = Route::of(Method::post, Template::of('/foo{+bar}'));
-                $request = $this->createMock(ServerRequest::class);
-                $request
-                    ->expects($this->once())
-                    ->method('protocolVersion')
-                    ->willReturn($protocol);
-                $request
-                    ->expects($this->once())
-                    ->method('url')
-                    ->willReturn(Url::of('/foo/somedata'));
+                $request = ServerRequest::of(
+                    Url::of('/foo/somedata'),
+                    Method::post,
+                    $protocol,
+                );
 
                 $response = $route->respondTo($request);
 
@@ -98,12 +92,15 @@ class RouteTest extends TestCase
         $this
             ->forAll(Set\Elements::of(...ProtocolVersion::cases()))
             ->then(function($protocol) {
-                $request = $this->createMock(ServerRequest::class);
-                $request
-                    ->expects($this->once())
-                    ->method('url')
-                    ->willReturn(Url::of('/foo/somedata'));
-                $expected = $this->createMock(Response::class);
+                $request = ServerRequest::of(
+                    Url::of('/foo/somedata'),
+                    Method::post,
+                    $protocol,
+                );
+                $expected = Response::of(
+                    StatusCode::ok,
+                    $protocol,
+                );
                 $route = Route::of(Method::post, Template::of('/foo{+bar}'))->handle(
                     function($serverRequest, $variables) use ($request, $expected) {
                         $this->assertSame($request, $serverRequest);
@@ -123,35 +120,28 @@ class RouteTest extends TestCase
             ->forAll(
                 Set\Elements::of(...Method::cases()),
                 Set\Elements::of('/foo', '/bar', '/'),
+                Set\Elements::of(...ProtocolVersion::cases()),
             )
-            ->then(function($method, $url) {
+            ->then(function($method, $url, $protocol) {
                 $pattern = "{$method->toString()} $url";
                 $route = Route::literal($pattern);
 
-                $request = $this->createMock(ServerRequest::class);
-                $request
-                    ->expects($this->once())
-                    ->method('method')
-                    ->willReturn($method);
-                $request
-                    ->expects($this->once())
-                    ->method('url')
-                    ->willReturn(Url::of($url));
+                $request = ServerRequest::of(
+                    Url::of($url),
+                    $method,
+                    $protocol,
+                );
 
                 $this->assertTrue($route->matches($request));
             });
 
         $route = Route::literal('POST /foo');
 
-        $request = $this->createMock(ServerRequest::class);
-        $request
-            ->expects($this->once())
-            ->method('method')
-            ->willReturn(Method::post);
-        $request
-            ->expects($this->once())
-            ->method('url')
-            ->willReturn(Url::of('/bar'));
+        $request = ServerRequest::of(
+            Url::of('/bar'),
+            Method::post,
+            ProtocolVersion::v11,
+        );
 
         $this->assertFalse($route->matches($request));
     }
