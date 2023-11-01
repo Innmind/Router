@@ -9,11 +9,11 @@ use Innmind\Router\{
     Exception\LogicException,
 };
 use Innmind\UrlTemplate\Template;
-use Innmind\Http\Message\{
+use Innmind\Http\{
     ServerRequest,
     Method,
     Response,
-    StatusCode,
+    Response\StatusCode,
 };
 use Innmind\Url\Url;
 use Innmind\Immutable\{
@@ -61,7 +61,7 @@ final class Route
             $name,
             $method,
             $template,
-            static fn(ServerRequest $request) => new Response\Response(
+            static fn(ServerRequest $request) => Response::of(
                 StatusCode::ok,
                 $request->protocolVersion(),
             ),

@@ -9,7 +9,7 @@ use Innmind\Router\{
     Route,
     Route\Name,
 };
-use Innmind\Http\Message\Method;
+use Innmind\Http\Method;
 use Innmind\UrlTemplate\Template;
 use Innmind\Url\Url;
 use Innmind\Immutable\{

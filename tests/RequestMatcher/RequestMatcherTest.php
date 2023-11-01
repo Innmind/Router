@@ -9,9 +9,10 @@ use Innmind\Router\{
     Route,
     Route\Name,
 };
-use Innmind\Http\Message\{
+use Innmind\Http\{
     ServerRequest,
     Method,
+    ProtocolVersion,
 };
 use Innmind\UrlTemplate\Template;
 use Innmind\Url\Url;
@@ -37,15 +38,11 @@ class RequestMatcherTest extends TestCase
                 Route::of(Method::get, Template::of('/foo')),
             ),
         );
-        $request = $this->createMock(ServerRequest::class);
-        $request
-            ->expects($this->exactly(2))
-            ->method('method')
-            ->willReturn(Method::post);
-        $request
-            ->expects($this->once())
-            ->method('url')
-            ->willReturn(Url::of('/foo'));
+        $request = ServerRequest::of(
+            Url::of('/foo'),
+            Method::post,
+            ProtocolVersion::v11,
+        );
 
         $this->assertSame($route, $match($request)->match(
             static fn($route) => $route,
@@ -62,14 +59,11 @@ class RequestMatcherTest extends TestCase
                 Route::of(Method::get, Template::of('/foo')),
             ),
         );
-        $request = $this->createMock(ServerRequest::class);
-        $request
-            ->expects($this->exactly(3))
-            ->method('method')
-            ->willReturn(Method::put);
-        $request
-            ->expects($this->never())
-            ->method('url');
+        $request = ServerRequest::of(
+            Url::of('/'),
+            Method::put,
+            ProtocolVersion::v11,
+        );
 
         $this->assertNull($match($request)->match(
             static fn($route) => $route,
