@@ -5,10 +5,10 @@ namespace Tests\Innmind\Router\Route;
 
 use Innmind\Router\Route\Variables;
 use Innmind\Immutable\Map;
-use PHPUnit\Framework\TestCase;
 use Innmind\BlackBox\{
     PHPUnit\BlackBox,
     Set,
+    PHPUnit\Framework\TestCase,
 };
 
 class VariablesTest extends TestCase

@@ -17,10 +17,10 @@ use Innmind\Http\{
     ProtocolVersion,
 };
 use Innmind\Url\Url;
-use PHPUnit\Framework\TestCase;
 use Innmind\BlackBox\{
     PHPUnit\BlackBox,
     Set,
+    PHPUnit\Framework\TestCase,
 };
 
 class RouteTest extends TestCase
@@ -83,7 +83,7 @@ class RouteTest extends TestCase
 
                 $this->assertSame(StatusCode::ok, $response->statusCode());
                 $this->assertSame($protocol, $response->protocolVersion());
-                $this->assertEmpty($response->body()->toString());
+                $this->assertSame('', $response->body()->toString());
             });
     }
 

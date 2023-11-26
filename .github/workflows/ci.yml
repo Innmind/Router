@@ -3,17 +3,40 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  phpunit:
+  blackbox:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
         php-version: ['8.2', '8.3']
         dependencies: ['lowest', 'highest']
-    name: 'PHPUnit'
+    name: 'BlackBox'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl
+          coverage: none
+      - name: Composer
+        uses: "ramsey/composer-install@v2"
+        with:
+          dependency-versions: ${{ matrix.dependencies }}
+      - name: BlackBox
+        run: php blackbox.php
+  coverage:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
+        php-version: ['8.2', '8.3']
+        dependencies: ['lowest', 'highest']
+    name: 'Coverage'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -24,9 +47,11 @@ jobs:
         uses: "ramsey/composer-install@v2"
         with:
           dependency-versions: ${{ matrix.dependencies }}
-      - name: PHPUnit
-        run: vendor/bin/phpunit --coverage-clover=coverage.clover
-      - uses: codecov/codecov-action@v1
+      - name: BlackBox
+        run: php blackbox.php
+        env:
+          ENABLE_COVERAGE: 'true'
+      - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
   psalm:
@@ -38,7 +63,7 @@ jobs:
     name: 'Psalm'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -58,7 +83,7 @@ jobs:
     name: 'CS'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
