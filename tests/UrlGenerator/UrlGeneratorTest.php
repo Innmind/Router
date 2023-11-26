@@ -8,6 +8,7 @@ use Innmind\Router\{
     UrlGenerator as UrlGeneratorInterface,
     Route,
     Route\Name,
+    Under,
 };
 use Innmind\Http\Method;
 use Innmind\UrlTemplate\Template;
@@ -35,9 +36,10 @@ class UrlGeneratorTest extends TestCase
             Sequence::of(
                 Route::of(Method::post, Template::of('/resource'))->named(Name::of('create')),
                 Route::of(Method::get, Template::of('/resource'))->named(Name::of('list')),
-                Route::of(Method::get, Template::of('/resource/{id}'))->named(Name::of('read')),
-                Route::of(Method::put, Template::of('/resource/{id}'))->named(Name::of('update')),
-                Route::of(Method::delete, Template::of('/resource/{id}'))->named(Name::of('delete')),
+                Under::of(Template::of('/resource/{id}'))
+                    ->route(Method::get, static fn($route) => $route->named(Name::of('read')))
+                    ->route(Method::put, static fn($route) => $route->named(Name::of('update')))
+                    ->route(Method::delete, static fn($route) => $route->named(Name::of('delete'))),
             ),
         );
 

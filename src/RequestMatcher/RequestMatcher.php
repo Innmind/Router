@@ -6,6 +6,7 @@ namespace Innmind\Router\RequestMatcher;
 use Innmind\Router\{
     RequestMatcher as RequestMatcherInterface,
     Route,
+    Under,
 };
 use Innmind\Http\ServerRequest;
 use Innmind\Immutable\{
@@ -15,11 +16,11 @@ use Innmind\Immutable\{
 
 final class RequestMatcher implements RequestMatcherInterface
 {
-    /** @var Sequence<Route> */
+    /** @var Sequence<Route|Under> */
     private Sequence $routes;
 
     /**
-     * @param Sequence<Route> $routes
+     * @param Sequence<Route|Under> $routes
      */
     public function __construct(Sequence $routes)
     {
@@ -28,6 +29,12 @@ final class RequestMatcher implements RequestMatcherInterface
 
     public function __invoke(ServerRequest $request): Maybe
     {
-        return $this->routes->find(static fn(Route $route): bool => $route->matches($request));
+        return $this
+            ->routes
+            ->find(static fn($route): bool => $route->matches($request))
+            ->flatMap(static fn($route) => match (true) {
+                $route instanceof Under => $route->match($request),
+                default => Maybe::just($route),
+            });
     }
 }

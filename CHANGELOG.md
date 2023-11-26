@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Router\Under`
+    - can be used in `Innmind\Router\RequestMatcher\RequestMatcher`
+    - can be used in `Innmind\Router\UrlGenerator\UrlGenerator`
+
 ## 4.0.0 - 2023-11-01
 
 ### Changed
