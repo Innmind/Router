@@ -18,7 +18,7 @@ use Innmind\Immutable\{
     Str,
     Map,
 };
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class UrlGeneratorTest extends TestCase
 {

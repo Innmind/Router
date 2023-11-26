@@ -7,10 +7,10 @@ use Innmind\Router\{
     Route\Name,
     Exception\DomainException,
 };
-use PHPUnit\Framework\TestCase;
 use Innmind\BlackBox\{
     PHPUnit\BlackBox,
     Set,
+    PHPUnit\Framework\TestCase,
 };
 
 class NameTest extends TestCase

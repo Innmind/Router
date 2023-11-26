@@ -18,7 +18,7 @@ use Innmind\Http\{
 use Innmind\UrlTemplate\Template;
 use Innmind\Url\Url;
 use Innmind\Immutable\Sequence;
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class RequestMatcherTest extends TestCase
 {
