@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Requires `innmind/immutable:~5.18`
+- Requires `innmind/http:~8.0`
+
 ### Fixed
 
 - PHP `8.4` deprecations
