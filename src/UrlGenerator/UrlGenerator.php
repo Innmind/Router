@@ -29,6 +29,7 @@ final class UrlGenerator implements UrlGeneratorInterface
         $this->routes = $routes;
     }
 
+    #[\Override]
     public function __invoke(Name $route, ?Map $variables = null): Url
     {
         return $this
