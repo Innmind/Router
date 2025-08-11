@@ -29,7 +29,7 @@ final class UrlGenerator implements UrlGeneratorInterface
         $this->routes = $routes;
     }
 
-    public function __invoke(Name $route, Map $variables = null): Url
+    public function __invoke(Name $route, ?Map $variables = null): Url
     {
         return $this
             ->routes

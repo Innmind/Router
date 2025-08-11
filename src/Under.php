@@ -44,7 +44,7 @@ final class Under
     /**
      * @param callable(Route): Route $map
      */
-    public function route(Method $method, callable $map = null): self
+    public function route(Method $method, ?callable $map = null): self
     {
         $map ??= static fn(Route $route): Route => $route;
 
