@@ -15,16 +15,16 @@ class VariablesTest extends TestCase
 {
     use BlackBox;
 
-    public function testMaybe()
+    public function testMaybe(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Strings::any(),
-                Set\Strings::any(),
-                Set\Strings::any(),
+                Set::strings(),
+                Set::strings(),
+                Set::strings(),
             )
             ->filter(static fn($key, $_, $unknown) => $key !== $unknown)
-            ->then(function($key, $value, $unknown) {
+            ->prove(function($key, $value, $unknown) {
                 $variables = Variables::of(Map::of([$key, $value]));
 
                 $this->assertSame($value, $variables->maybe($key)->match(
