@@ -27,6 +27,7 @@ final class RequestMatcher implements RequestMatcherInterface
         $this->routes = $routes;
     }
 
+    #[\Override]
     public function __invoke(ServerRequest $request): Maybe
     {
         return $this
