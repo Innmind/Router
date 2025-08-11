@@ -17,5 +17,5 @@ interface UrlGenerator
      *
      * @throws NoMatchingRouteFound
      */
-    public function __invoke(Name $route, Map $variables = null): Url;
+    public function __invoke(Name $route, ?Map $variables = null): Url;
 }

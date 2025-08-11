@@ -15,7 +15,6 @@ use Innmind\UrlTemplate\Template;
 use Innmind\Url\Url;
 use Innmind\Immutable\{
     Sequence,
-    Str,
     Map,
 };
 use Innmind\BlackBox\PHPUnit\Framework\TestCase;
