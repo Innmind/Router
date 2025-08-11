@@ -17,26 +17,26 @@ class NameTest extends TestCase
 {
     use BlackBox;
 
-    public function testInterface()
+    public function testInterface(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Strings::any()->filter(static fn($value) => $value !== ''))
-            ->then(function(string $value): void {
+        return $this
+            ->forAll(Set::strings()->filter(static fn($value) => $value !== ''))
+            ->prove(function(string $value): void {
                 $this->assertSame($value, Name::of($value)->toString());
             });
     }
 
-    public function testEquals()
+    public function testEquals(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Strings::any()->filter(static fn($value) => $value !== ''),
-                Set\Strings::any()->filter(static fn($value) => $value !== ''),
+                Set::strings()->filter(static fn($value) => $value !== ''),
+                Set::strings()->filter(static fn($value) => $value !== ''),
             )
             ->filter(static function($a, $b): bool {
                 return $a !== $b;
             })
-            ->then(function($a, $b): void {
+            ->prove(function($a, $b): void {
                 $this->assertTrue(Name::of($a)->equals(Name::of($a)));
                 $this->assertFalse(Name::of($a)->equals(Name::of($b)));
                 $this->assertFalse(Name::of($b)->equals(Name::of($a)));

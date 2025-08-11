@@ -67,11 +67,11 @@ class RouteTest extends TestCase
         $this->assertTrue($route->matches($request2));
     }
 
-    public function testRespondToWithOkResponseByDefault()
+    public function testRespondToWithOkResponseByDefault(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Elements::of(...ProtocolVersion::cases()))
-            ->then(function($protocol) {
+        return $this
+            ->forAll(Set::of(...ProtocolVersion::cases()))
+            ->prove(function($protocol) {
                 $route = Route::of(Method::post, Template::of('/foo{+bar}'));
                 $request = ServerRequest::of(
                     Url::of('/foo/somedata'),
@@ -87,11 +87,11 @@ class RouteTest extends TestCase
             });
     }
 
-    public function testRespondTo()
+    public function testRespondTo(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Elements::of(...ProtocolVersion::cases()))
-            ->then(function($protocol) {
+        return $this
+            ->forAll(Set::of(...ProtocolVersion::cases()))
+            ->prove(function($protocol) {
                 $request = ServerRequest::of(
                     Url::of('/foo/somedata'),
                     Method::post,
@@ -114,15 +114,15 @@ class RouteTest extends TestCase
             });
     }
 
-    public function testLiteral()
+    public function testLiteral(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Elements::of(...Method::cases()),
-                Set\Elements::of('/foo', '/bar', '/'),
-                Set\Elements::of(...ProtocolVersion::cases()),
+                Set::of(...Method::cases()),
+                Set::of('/foo', '/bar', '/'),
+                Set::of(...ProtocolVersion::cases()),
             )
-            ->then(function($method, $url, $protocol) {
+            ->prove(function($method, $url, $protocol) {
                 $pattern = "{$method->toString()} $url";
                 $route = Route::literal($pattern);
 
