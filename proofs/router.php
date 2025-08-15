@@ -11,15 +11,22 @@ use Innmind\Immutable\{
     Attempt,
     SideEffect,
 };
+use Innmind\BlackBox\Set;
+use Fixtures\Innmind\Url\Url as FUrl;
 
 return static function() {
-    yield test(
+    yield proof(
         'Handle::via()',
-        static function($assert) {
+        given(
+            FUrl::any(),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+        ),
+        static function($assert, $url, $method, $protocolVersion) {
             $request = Http\ServerRequest::of(
-                Url::of('/'),
-                Http\Method::get,
-                Http\ProtocolVersion::v11,
+                $url,
+                $method,
+                $protocolVersion,
             );
             $expected = Http\Response::of(
                 Http\Response\StatusCode::ok,
