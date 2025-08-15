@@ -4,6 +4,7 @@ declare(strict_types = 1);
 use Innmind\Router\{
     Router,
     Handle,
+    Method,
 };
 use Innmind\Http;
 use Innmind\Url\Url;
@@ -63,6 +64,40 @@ return static function() {
             $assert->same(
                 $expected,
                 $router($request)->match(
+                    static fn() => null,
+                    static fn($e) => $e,
+                ),
+            );
+        },
+    );
+
+    yield proof(
+        'Method::*',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\Method::cases()),
+        )->filter(static fn($a, $b) => $a !== $b),
+        static function($assert, $method, $other) {
+            $request = Http\ServerRequest::of(
+                Url::of('/'),
+                $method,
+                Http\ProtocolVersion::v11,
+            );
+            $component = Method::{$method->name}();
+
+            $assert->same(
+                $method,
+                $component($request, SideEffect::identity())->unwrap(),
+            );
+
+            $request = Http\ServerRequest::of(
+                Url::of('/'),
+                $other,
+                Http\ProtocolVersion::v11,
+            );
+
+            $assert->object(
+                $component($request, SideEffect::identity())->match(
                     static fn() => null,
                     static fn($e) => $e,
                 ),
