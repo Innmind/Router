@@ -13,6 +13,7 @@ use Innmind\Http;
 use Innmind\Url\Url;
 use Innmind\Immutable\{
     Attempt,
+    Sequence,
     SideEffect,
 };
 use Innmind\BlackBox\Set;
@@ -231,6 +232,76 @@ return static function() {
 
             $assert->object(
                 $component($request, SideEffect::identity())->match(
+                    static fn() => null,
+                    static fn($e) => $e,
+                ),
+            );
+        },
+    );
+
+    yield proof(
+        'Any::from() empty sequence always fail',
+        given(
+            FUrl::any(),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+        ),
+        static function($assert, $url, $method, $protocolVersion) {
+            $request = Http\ServerRequest::of(
+                $url,
+                $method,
+                $protocolVersion,
+            );
+            $router = Router::of(Any::from(Sequence::of()));
+
+            $assert->object(
+                $router($request)->match(
+                    static fn() => null,
+                    static fn($e) => $e,
+                ),
+            );
+        },
+    );
+
+    yield proof(
+        'Any::from()',
+        given(
+            FUrl::any(),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+            Set::of(...Http\Response\StatusCode::cases()),
+        ),
+        static function($assert, $url, $method, $protocolVersion, $status) {
+            $request = Http\ServerRequest::of(
+                $url,
+                $method,
+                $protocolVersion,
+            );
+            $router = Router::of(Any::from(Sequence::of(
+                Handle::via(static fn() => Attempt::error(new Exception)),
+                Handle::via(static fn($request) => Attempt::result(Http\Response::of(
+                    $status,
+                    $request->protocolVersion(),
+                ))),
+            )));
+
+            $assert->same(
+                $request->protocolVersion(),
+                $router($request)->match(
+                    static fn($response) => $response->protocolVersion(),
+                    static fn() => null,
+                ),
+            );
+
+            $expected = new Exception;
+            $router = Router::of(Any::from(Sequence::of(
+                Handle::via(static fn() => Attempt::error(new Exception)),
+                Handle::via(static fn($request) => Attempt::error($expected)),
+            )));
+
+            $assert->same(
+                $expected,
+                $router($request)->match(
                     static fn() => null,
                     static fn($e) => $e,
                 ),
