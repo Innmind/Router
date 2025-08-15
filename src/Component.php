@@ -49,6 +49,23 @@ final class Component
     /**
      * @template T
      *
+     * @param callable(O): T $map
+     *
+     * @return self<I, T>
+     */
+    public function map(callable $map): self
+    {
+        $previous = $this->implementation;
+
+        /** @psalm-suppress MixedArgument */
+        return new self(
+            static fn($request, $input) => $previous($request, $input)->map($map),
+        );
+    }
+
+    /**
+     * @template T
+     *
      * @param callable(O): self<O, T> $map
      *
      * @return self<I, T>

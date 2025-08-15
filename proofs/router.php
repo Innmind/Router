@@ -140,4 +140,24 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Component->map()',
+        given(Set::of(...Http\Method::cases())),
+        static function($assert, $method) {
+            $request = Http\ServerRequest::of(
+                Url::of('/'),
+                $method,
+                Http\ProtocolVersion::v11,
+            );
+            $component = Method::{$method->name}()->map(
+                static fn($method) => $method->name,
+            );
+
+            $assert->same(
+                $method->name,
+                $component($request, SideEffect::identity())->unwrap(),
+            );
+        },
+    );
 };
