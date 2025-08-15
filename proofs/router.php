@@ -427,4 +427,82 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Handle::of()',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+            Set::of(...Http\Response\StatusCode::cases()),
+        ),
+        static function($assert, $method, $protocolVersion, $status) {
+            $req = Http\ServerRequest::of(
+                Url::of('/foo'),
+                $method,
+                $protocolVersion,
+            );
+            $expected = Http\Response::of(
+                $status,
+                $req->protocolVersion(),
+            );
+            $router = Router::of(
+                Method::{$method->name}()
+                    ->map(Collect::of('method2'))
+                    ->pipe(Collect::merge(Endpoint::of('{/name}')))
+                    ->pipe(Handle::of(
+                        static function($method2, $name, $request, $unknown = null) use ($req, $expected, $assert, $method) {
+                            $assert->same($method, $method2);
+                            $assert->same('foo', $name);
+                            $assert->same($req, $request);
+                            $assert->null($unknown);
+
+                            return Attempt::result($expected);
+                        },
+                    )),
+            );
+
+            $assert->same(
+                $expected,
+                $router($req)->unwrap(),
+            );
+        },
+    );
+
+    yield proof(
+        'Handle::of() with unknown argument fails',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+            Set::of(...Http\Response\StatusCode::cases()),
+        ),
+        static function($assert, $method, $protocolVersion, $status) {
+            $request = Http\ServerRequest::of(
+                Url::of('/foo'),
+                $method,
+                $protocolVersion,
+            );
+            $expected = Http\Response::of(
+                $status,
+                $request->protocolVersion(),
+            );
+            $router = Router::of(
+                Method::{$method->name}()
+                    ->map(Collect::of('method2'))
+                    ->pipe(Collect::merge(Endpoint::of('{/name}')))
+                    ->pipe(Handle::of(
+                        static function($method2, $name, $request, $unknown) use ($assert) {
+                            $assert->fail('it should not call the handler');
+                        },
+                    )),
+            );
+
+            $assert->object(
+                $expected,
+                $router($request)->match(
+                    static fn() => null,
+                    static fn($e) => $e,
+                ),
+            );
+        },
+    );
 };
