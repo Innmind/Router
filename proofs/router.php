@@ -6,6 +6,7 @@ use Innmind\Router\{
     Handle,
     Method,
     Endpoint,
+    Host,
 };
 use Innmind\Http;
 use Innmind\Url\Url;
@@ -157,6 +158,41 @@ return static function() {
             $assert->same(
                 $method->name,
                 $component($request, SideEffect::identity())->unwrap(),
+            );
+        },
+    );
+
+    yield proof(
+        'Host::of()',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+        ),
+        static function($assert, $method, $protocolVersion) {
+            $request = Http\ServerRequest::of(
+                Url::of('http://foo:bar@example.com/hello/world'),
+                $method,
+                $protocolVersion,
+            );
+            $router = Router::of(Host::of('example{.tld}/'));
+
+            $result = $router($request)->unwrap();
+            $assert->count(1, $result);
+            $assert->same(
+                'com',
+                $result->get('tld')->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+
+            $router = Router::of(Host::of('example.fr/'));
+
+            $assert->object(
+                $router($request)->match(
+                    static fn() => null,
+                    static fn($e) => $e,
+                ),
             );
         },
     );
