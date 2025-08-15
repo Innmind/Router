@@ -105,10 +105,15 @@ final class Component
     {
         $previous = $this->implementation;
 
+        // Never try to recover from a handle error as it may lead to another
+        // handle being called
         /** @psalm-suppress MixedArgument */
         return new self(
             static fn(ServerRequest $request, mixed $input) => $previous($request, $input)->recover(
-                static fn($error) => $recover($error)($request, $input),
+                static fn($error) => match (true) {
+                    $error instanceof Exception\HandleError => Attempt::error($error),
+                    default => $recover($error)($request, $input),
+                },
             ),
         );
     }
@@ -123,5 +128,20 @@ final class Component
     public function or(self $component): self
     {
         return $this->otherwise(static fn() => $component);
+    }
+
+    /**
+     * @param callable(\Throwable): \Throwable $map
+     *
+     * @return self<I, O>
+     */
+    public function mapError(callable $map): self
+    {
+        $previous = $this->implementation;
+
+        /** @psalm-suppress MixedArgument */
+        return new self(
+            static fn($request, $input) => $previous($request, $input)->mapError($map),
+        );
     }
 }

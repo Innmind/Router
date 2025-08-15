@@ -24,7 +24,9 @@ final class Handle
      */
     public static function via(callable $handler): Component
     {
-        return Component::of($handler);
+        return Component::of($handler)->mapError(
+            static fn($e) => new Exception\HandleError($e),
+        );
     }
 
     /**
@@ -70,6 +72,6 @@ final class Handle
 
                 return $handler(...$args);
             },
-        );
+        )->mapError(static fn($e) => new Exception\HandleError($e));
     }
 }

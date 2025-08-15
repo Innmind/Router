@@ -48,9 +48,14 @@ final class Any
                     static function($_, $component, $continuation) use ($request, $input) {
                         $result = $component($request, $input);
 
+                        // Never try to recover from a handle error as it may
+                        // lead to another handle being called
                         return $result->match(
                             static fn() => $continuation->stop($result),
-                            static fn() => $continuation->continue($result),
+                            static fn($e) => match (true) {
+                                $e instanceof Exception\HandleError => $continuation->stop($result),
+                                default => $continuation->continue($result),
+                            },
                         );
                     },
                 ),

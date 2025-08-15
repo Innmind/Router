@@ -27,7 +27,12 @@ final class Router
 
     public function __invoke(ServerRequest $request): Attempt
     {
-        return ($this->component)($request, SideEffect::identity());
+        return ($this->component)($request, SideEffect::identity())->mapError(
+            static fn($e) => match (true) {
+                $e instanceof Exception\HandleError => $e->unwrap(),
+                default => $e,
+            },
+        );
     }
 
     /**

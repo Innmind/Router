@@ -270,17 +270,23 @@ return static function() {
         given(
             FUrl::any(),
             Set::of(...Http\Method::cases()),
+            Set::of(...Http\Method::cases()),
             Set::of(...Http\ProtocolVersion::cases()),
             Set::of(...Http\Response\StatusCode::cases()),
-        ),
-        static function($assert, $url, $method, $protocolVersion, $status) {
+        )->filter(static fn($_, $a, $b) => $a !== $b),
+        static function($assert, $url, $method, $wrongMethod, $protocolVersion, $status) {
             $request = Http\ServerRequest::of(
                 $url,
                 $method,
                 $protocolVersion,
             );
             $router = Router::of(Any::from(Sequence::of(
-                Handle::via(static fn() => Attempt::error(new Exception)),
+                Method::{$wrongMethod->name}()->map(
+                    static fn() => Http\Response::of(
+                        Http\Response\StatusCode::ok,
+                        $request->protocolVersion(),
+                    ),
+                ),
                 Handle::via(static fn($request) => Attempt::result(Http\Response::of(
                     $status,
                     $request->protocolVersion(),
@@ -297,7 +303,12 @@ return static function() {
 
             $expected = new Exception;
             $router = Router::of(Any::from(Sequence::of(
-                Handle::via(static fn() => Attempt::error(new Exception)),
+                Method::{$wrongMethod->name}()->map(
+                    static fn($request) => Http\Response::of(
+                        Http\Response\StatusCode::ok,
+                        $request->protocolVersion(),
+                    ),
+                ),
                 Handle::via(static fn($request) => Attempt::error($expected)),
             )));
 
@@ -314,22 +325,31 @@ return static function() {
     yield proof(
         'Respond::with()',
         given(
-            FUrl::any(),
             Set::of(...Http\Method::cases()),
             Set::of(...Http\ProtocolVersion::cases()),
             Set::of(...Http\Response\StatusCode::cases()),
         ),
-        static function($assert, $url, $method, $protocolVersion, $status) {
+        static function($assert, $method, $protocolVersion, $status) {
             $request = Http\ServerRequest::of(
-                $url,
+                Url::of('/'),
                 $method,
                 $protocolVersion,
             );
 
             $router = Router::of(
                 Any::from(Sequence::of(
-                    Handle::via(static fn() => Attempt::error(new Exception)),
-                    Handle::via(static fn($request) => Attempt::error(new Exception)),
+                    Endpoint::of('/foo')->map(
+                        static fn() => Http\Response::of(
+                            Http\Response\StatusCode::ok,
+                            $request->protocolVersion(),
+                        ),
+                    ),
+                    Endpoint::of('/bar')->map(
+                        static fn() => Http\Response::of(
+                            Http\Response\StatusCode::ok,
+                            $request->protocolVersion(),
+                        ),
+                    ),
                 ))
                     ->or(Respond::notFound()),
             );
