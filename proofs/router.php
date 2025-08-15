@@ -9,6 +9,7 @@ use Innmind\Router\{
     Host,
     Any,
     Respond,
+    Collect,
 };
 use Innmind\Http;
 use Innmind\Url\Url;
@@ -339,6 +340,90 @@ return static function() {
                     static fn($response) => $response->statusCode(),
                     static fn() => null,
                 ),
+            );
+        },
+    );
+
+    yield proof(
+        'Collect',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+            Set::of(...Http\Response\StatusCode::cases()),
+        ),
+        static function($assert, $method, $protocolVersion, $status) {
+            $request = Http\ServerRequest::of(
+                Url::of('/foo'),
+                $method,
+                $protocolVersion,
+            );
+            $expected = Http\Response::of(
+                $status,
+                $request->protocolVersion(),
+            );
+            $router = Router::of(
+                Method::{$method->name}()
+                    ->map(Collect::of('method'))
+                    ->pipe(Collect::merge(Endpoint::of('{/name}')))
+                    ->pipe(Handle::via(
+                        static function($_, $input) use ($expected, $assert, $method) {
+                            $assert->same(
+                                $method,
+                                $input->get('method')->match(
+                                    static fn($value) => $value,
+                                    static fn() => null,
+                                ),
+                            );
+                            $assert->same(
+                                'foo',
+                                $input->get('name')->match(
+                                    static fn($value) => $value,
+                                    static fn() => null,
+                                ),
+                            );
+
+                            return Attempt::result($expected);
+                        },
+                    )),
+            );
+
+            $assert->same(
+                $expected,
+                $router($request)->unwrap(),
+            );
+
+            $router = Router::of(
+                Method::{$method->name}()
+                    ->map(Collect::of('method'))
+                    ->pipe(Collect::as('params', Endpoint::of('{/name}')))
+                    ->pipe(Handle::via(
+                        static function($_, $input) use ($expected, $assert, $method) {
+                            $assert->same(
+                                $method,
+                                $input->get('method')->match(
+                                    static fn($value) => $value,
+                                    static fn() => null,
+                                ),
+                            );
+                            $assert->same(
+                                'foo',
+                                $input
+                                    ->get('params')
+                                    ->flatMap(static fn($params) => $params->get('name'))
+                                    ->match(
+                                        static fn($value) => $value,
+                                        static fn() => null,
+                                    ),
+                            );
+
+                            return Attempt::result($expected);
+                        },
+                    )),
+            );
+
+            $assert->same(
+                $expected,
+                $router($request)->unwrap(),
             );
         },
     );
