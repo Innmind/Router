@@ -13,6 +13,7 @@ final class Handle
 {
     /**
      * @template I
+     * @psalm-pure
      *
      * @param callable(ServerRequest, I): Attempt<Response> $handler
      *

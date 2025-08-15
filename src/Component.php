@@ -9,6 +9,7 @@ use Innmind\Immutable\Attempt;
 /**
  * @template I
  * @template O
+ * @psalm-immutable
  */
 final class Component
 {
@@ -27,12 +28,14 @@ final class Component
      */
     public function __invoke(ServerRequest $request, mixed $input): Attempt
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return ($this->implementation)($request, $input);
     }
 
     /**
      * @template A
      * @template B
+     * @psalm-pure
      *
      * @param callable(ServerRequest, A): Attempt<B> $component
      *

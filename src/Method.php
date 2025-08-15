@@ -9,6 +9,8 @@ use Innmind\Immutable\Attempt;
 final class Method
 {
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     public static function get(): Component
@@ -17,6 +19,8 @@ final class Method
     }
 
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     public static function post(): Component
@@ -25,6 +29,8 @@ final class Method
     }
 
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     public static function put(): Component
@@ -33,6 +39,8 @@ final class Method
     }
 
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     public static function patch(): Component
@@ -41,6 +49,8 @@ final class Method
     }
 
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     public static function delete(): Component
@@ -49,6 +59,8 @@ final class Method
     }
 
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     public static function options(): Component
@@ -57,6 +69,8 @@ final class Method
     }
 
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     public static function trace(): Component
@@ -65,6 +79,8 @@ final class Method
     }
 
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     public static function connect(): Component
@@ -73,6 +89,8 @@ final class Method
     }
 
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     public static function head(): Component
@@ -81,6 +99,8 @@ final class Method
     }
 
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     public static function link(): Component
@@ -89,6 +109,8 @@ final class Method
     }
 
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     public static function unlink(): Component
@@ -97,6 +119,8 @@ final class Method
     }
 
     /**
+     * @psalm-pure
+     *
      * @return Component<mixed, Http\Method>
      */
     private static function of(Http\Method $method): Component

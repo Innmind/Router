@@ -12,6 +12,9 @@ use Innmind\Immutable\{
     SideEffect,
 };
 
+/**
+ * @psalm-immutable
+ */
 final class Router
 {
     /**
@@ -28,6 +31,8 @@ final class Router
     }
 
     /**
+     * @psalm-pure
+     *
      * @param Component<SideEffect, Response> $component
      */
     public static function of(Component $component): self
