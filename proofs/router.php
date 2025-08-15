@@ -7,6 +7,7 @@ use Innmind\Router\{
     Method,
     Endpoint,
     Host,
+    Any,
 };
 use Innmind\Http;
 use Innmind\Url\Url;
@@ -190,6 +191,46 @@ return static function() {
 
             $assert->object(
                 $router($request)->match(
+                    static fn() => null,
+                    static fn($e) => $e,
+                ),
+            );
+        },
+    );
+
+    yield proof(
+        'Any::of',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\Method::cases()),
+        )
+            ->filter(static fn($a, $b) => $a !== $b)
+            ->filter(static fn($a, $b, $c) => $a !== $c && $b !== $c),
+        static function($assert, $method, $other, $third) {
+            $request = Http\ServerRequest::of(
+                Url::of('/'),
+                $other,
+                Http\ProtocolVersion::v11,
+            );
+            $component = Any::of(
+                Method::{$method->name}(),
+                Method::{$other->name}(),
+            );
+
+            $assert->same(
+                $other,
+                $component($request, SideEffect::identity())->unwrap(),
+            );
+
+            $request = Http\ServerRequest::of(
+                Url::of('/'),
+                $third,
+                Http\ProtocolVersion::v11,
+            );
+
+            $assert->object(
+                $component($request, SideEffect::identity())->match(
                     static fn() => null,
                     static fn($e) => $e,
                 ),
