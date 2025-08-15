@@ -74,7 +74,7 @@ use Innmind\Filesystem\Name;
 use Innmind\Url\Path;
 
 new class extends Main {
-    private RequestMatcher $router;
+    private Router $router;
 
     protected function preload(OperatingSystem $os): void
     {
