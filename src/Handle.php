@@ -20,17 +20,6 @@ final class Handle
      */
     public static function via(callable $handler): Component
     {
-        $handler = \Closure::fromCallable($handler);
-
-        /**
-         * @psalm-suppress PossiblyNullFunctionCall
-         * @psalm-suppress MixedReturnStatement
-         * @psalm-suppress InaccessibleMethod
-         */
-        return (\Closure::bind(
-            static fn() => new Component($handler),
-            null,
-            Component::class,
-        ))();
+        return Component::of($handler);
     }
 }

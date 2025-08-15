@@ -31,6 +31,19 @@ final class Component
     }
 
     /**
+     * @template A
+     * @template B
+     *
+     * @param callable(ServerRequest, A): Attempt<B> $component
+     *
+     * @return self<A, B>
+     */
+    public static function of(callable $component): self
+    {
+        return new self(\Closure::fromCallable($component));
+    }
+
+    /**
      * @template T
      *
      * @param callable(O): self<O, T> $map

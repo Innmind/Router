@@ -101,20 +101,11 @@ final class Method
      */
     private static function of(Http\Method $method): Component
     {
-        /**
-         * @psalm-suppress PossiblyNullFunctionCall
-         * @psalm-suppress MixedReturnStatement
-         * @psalm-suppress InaccessibleMethod
-         */
-        return (\Closure::bind(
-            static fn() => new Component(
-                static fn(Http\ServerRequest $request, $input) => match ($request->method()) {
-                    $method => Attempt::result($method),
-                    default => Attempt::error(new \RuntimeException), // todo use better exception
-                },
-            ),
-            null,
-            Component::class,
-        ))();
+        return Component::of(
+            static fn(Http\ServerRequest $request, $input) => match ($request->method()) {
+                $method => Attempt::result($method),
+                default => Attempt::error(new \RuntimeException), // todo use better exception
+            },
+        );
     }
 }
