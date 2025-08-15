@@ -1,6 +1,40 @@
 # Changelog
 
-## 4.1.0 - 2023-10-26
+## 5.0.0 - 2025-08-15
+
+### Added
+
+- `Innmind\Router\Any`
+- `Innmind\Router\Collect`
+- `Innmind\Router\Component`
+- `Innmind\Router\Endpoint`
+- `Innmind\Router\Handle`
+- `Innmind\Router\Host`
+- `Innmind\Router\Method`
+- `Innmind\Router\Respond`
+- `Innmind\Router\Router`
+
+### Changed
+
+- Requires `innmind/immutable:~5.18`
+- Requires `innmind/http:~8.0`
+- `Innmind\Router\Route` is now an interface to provide a named route to `Innmind\Router\Endpoint::of()`
+
+### Removed
+
+- `Innmind\Router\RequestMatcher`
+- `Innmind\Router\RequestMatcher\RequestMatcher`
+- `Innmind\Router\UrlGenerator`
+- `Innmind\Router\UrlGenerator\UrlGenerator`
+- `Innmind\Router\Route\Name`
+- `Innmind\Router\Route\Variables`
+- `Innmind\Router\Under`
+
+### Fixed
+
+- PHP `8.4` deprecations
+
+## 4.1.0 - 2023-11-26
 
 ### Added
 
