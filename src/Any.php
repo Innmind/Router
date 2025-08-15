@@ -29,8 +29,6 @@ final class Any
     }
 
     /**
-     * This should only be used with a lazy Sequence.
-     *
      * @internal
      * @psalm-pure
      *
@@ -45,13 +43,16 @@ final class Any
 
         return Component::of(
             static fn($request, $input) => $components
-                ->map(static fn($component) => $component($request, $input))
                 ->sink($response)
                 ->until(
-                    static fn($_, $result, $continuation) => $result->match(
-                        static fn() => $continuation->stop($result),
-                        static fn() => $continuation->continue($result),
-                    ),
+                    static function($_, $component, $continuation) use ($request, $input) {
+                        $result = $component($request, $input);
+
+                        return $result->match(
+                            static fn() => $continuation->stop($result),
+                            static fn() => $continuation->continue($result),
+                        );
+                    },
                 )
                 ->mapError(static fn($e) => $e), // todo distinguish between no component vs none matched
         );
