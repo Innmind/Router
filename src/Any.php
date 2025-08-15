@@ -39,7 +39,7 @@ final class Any
     public static function from(Sequence $components): Component
     {
         /** @var Attempt<Response> */
-        $response = Attempt::error(new \Exception); // todo use better exception
+        $response = Attempt::error(new Exception\NoRouteProvided);
 
         return Component::of(
             static fn($request, $input) => $components
@@ -53,8 +53,7 @@ final class Any
                             static fn() => $continuation->continue($result),
                         );
                     },
-                )
-                ->mapError(static fn($e) => $e), // todo distinguish between no component vs none matched
+                ),
         );
     }
 }

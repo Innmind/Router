@@ -128,7 +128,7 @@ final class Method
         return Component::of(
             static fn(Http\ServerRequest $request, $input) => match ($request->method()) {
                 $method => Attempt::result($method),
-                default => Attempt::error(new \RuntimeException), // todo use better exception
+                default => Attempt::error(new Exception\MethodNotAllowed),
             },
         );
     }

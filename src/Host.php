@@ -47,7 +47,7 @@ final class Host
 
                     return match ($template->matches($url)) {
                         true => $template->extract($url),
-                        false => throw new \Exception, // todo use better exception
+                        false => throw new Exception\NotFound,
                     };
                 },
             ),
