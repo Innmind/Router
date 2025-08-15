@@ -26,6 +26,7 @@ final class Component
      *
      * @return Attempt<O>
      */
+    #[\NoDiscard]
     public function __invoke(ServerRequest $request, mixed $input): Attempt
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -41,6 +42,7 @@ final class Component
      *
      * @return self<A, B>
      */
+    #[\NoDiscard]
     public static function of(callable $component): self
     {
         return new self(\Closure::fromCallable($component));
@@ -53,6 +55,7 @@ final class Component
      *
      * @return self<I, T>
      */
+    #[\NoDiscard]
     public function map(callable $map): self
     {
         $previous = $this->implementation;
@@ -70,6 +73,7 @@ final class Component
      *
      * @return self<I, T>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         $previous = $this->implementation;
@@ -89,6 +93,7 @@ final class Component
      *
      * @return self<I, T>
      */
+    #[\NoDiscard]
     public function pipe(self $component): self
     {
         return $this->flatMap(static fn() => $component);
@@ -101,6 +106,7 @@ final class Component
      *
      * @return self<I, T>
      */
+    #[\NoDiscard]
     public function otherwise(callable $recover): self
     {
         $previous = $this->implementation;
@@ -125,6 +131,7 @@ final class Component
      *
      * @return self<I, T>
      */
+    #[\NoDiscard]
     public function or(self $component): self
     {
         return $this->otherwise(static fn() => $component);
@@ -135,6 +142,7 @@ final class Component
      *
      * @return self<I, O>
      */
+    #[\NoDiscard]
     public function mapError(callable $map): self
     {
         $previous = $this->implementation;

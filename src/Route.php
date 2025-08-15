@@ -13,5 +13,6 @@ use Innmind\UrlTemplate\Template;
  */
 interface Route
 {
+    #[\NoDiscard]
     public function template(): Template;
 }

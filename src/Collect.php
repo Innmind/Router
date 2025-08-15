@@ -14,6 +14,7 @@ final class Collect
      *
      * @return callable(mixed): Map<string, mixed>
      */
+    #[\NoDiscard]
     public static function of(string $name): callable
     {
         return static fn($output) => Map::of([$name, $output]);
@@ -26,6 +27,7 @@ final class Collect
      *
      * @return Component<Map<string, mixed>, Map<string, mixed>>
      */
+    #[\NoDiscard]
     public static function merge(Component $component): Component
     {
         /**
@@ -47,6 +49,7 @@ final class Collect
      *
      * @return Component<Map<string, mixed>, Map<string, mixed>>
      */
+    #[\NoDiscard]
     public static function as(string $name, Component $component): Component
     {
         /**

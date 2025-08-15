@@ -16,6 +16,7 @@ final class Respond
      *
      * @return Component<mixed, Response>
      */
+    #[\NoDiscard]
     public static function with(StatusCode $status): Component
     {
         return Component::of(static fn($request) => Attempt::result(Response::of(
@@ -29,6 +30,7 @@ final class Respond
      *
      * @return Component<mixed, Response>
      */
+    #[\NoDiscard]
     public static function notFound(): Component
     {
         return self::with(StatusCode::notFound);
@@ -37,6 +39,7 @@ final class Respond
     /**
      * @psalm-pure
      */
+    #[\NoDiscard]
     public static function withHttpErrors(): callable
     {
         return static fn(\Throwable $e) => Component::of(

@@ -22,6 +22,7 @@ final class Handle
      *
      * @return Component<I, Response>
      */
+    #[\NoDiscard]
     public static function via(callable $handler): Component
     {
         return Component::of($handler)->mapError(
@@ -36,6 +37,7 @@ final class Handle
      *
      * @return Component<Map<string, mixed>, Response>
      */
+    #[\NoDiscard]
     public static function of(callable $handler): Component
     {
         /** @var Component<Map<string, mixed>, Response> */
