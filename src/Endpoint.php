@@ -22,6 +22,7 @@ final class Endpoint
      *
      * @return Component<mixed, Map<string, string>>
      */
+    #[\NoDiscard]
     public static function of(string|Template|Route $template): Component
     {
         if (\is_string($template)) {

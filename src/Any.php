@@ -19,6 +19,7 @@ final class Any
      *
      * @return Component<mixed, Response>
      */
+    #[\NoDiscard]
     public static function of(Component $a, Component ...$rest): Component
     {
         foreach ($rest as $b) {
@@ -36,6 +37,7 @@ final class Any
      *
      * @return Component<mixed, Response>
      */
+    #[\NoDiscard]
     public static function from(Sequence $components): Component
     {
         /** @var Attempt<Response> */

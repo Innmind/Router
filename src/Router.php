@@ -25,6 +25,7 @@ final class Router
     ) {
     }
 
+    #[\NoDiscard]
     public function __invoke(ServerRequest $request): Attempt
     {
         return ($this->component)($request, SideEffect::identity())->mapError(
@@ -40,6 +41,7 @@ final class Router
      *
      * @param Component<SideEffect, Response> $component
      */
+    #[\NoDiscard]
     public static function of(Component $component): self
     {
         return new self($component);
