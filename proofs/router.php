@@ -8,6 +8,7 @@ use Innmind\Router\{
     Endpoint,
     Host,
     Any,
+    Respond,
 };
 use Innmind\Http;
 use Innmind\Url\Url;
@@ -304,6 +305,39 @@ return static function() {
                 $router($request)->match(
                     static fn() => null,
                     static fn($e) => $e,
+                ),
+            );
+        },
+    );
+
+    yield proof(
+        'Respond::with()',
+        given(
+            FUrl::any(),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+            Set::of(...Http\Response\StatusCode::cases()),
+        ),
+        static function($assert, $url, $method, $protocolVersion, $status) {
+            $request = Http\ServerRequest::of(
+                $url,
+                $method,
+                $protocolVersion,
+            );
+
+            $router = Router::of(
+                Any::from(Sequence::of(
+                    Handle::via(static fn() => Attempt::error(new Exception)),
+                    Handle::via(static fn($request) => Attempt::error(new Exception)),
+                ))
+                    ->or(Respond::notFound()),
+            );
+
+            $assert->same(
+                Http\Response\StatusCode::notFound,
+                $router($request)->match(
+                    static fn($response) => $response->statusCode(),
+                    static fn() => null,
                 ),
             );
         },
