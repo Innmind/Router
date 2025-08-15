@@ -5,6 +5,7 @@ use Innmind\Router\{
     Router,
     Handle,
     Method,
+    Endpoint,
 };
 use Innmind\Http;
 use Innmind\Url\Url;
@@ -98,6 +99,41 @@ return static function() {
 
             $assert->object(
                 $component($request, SideEffect::identity())->match(
+                    static fn() => null,
+                    static fn($e) => $e,
+                ),
+            );
+        },
+    );
+
+    yield proof(
+        'Endpoint::of()',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+        ),
+        static function($assert, $method, $protocolVersion) {
+            $request = Http\ServerRequest::of(
+                Url::of('http://whatever/hello/world'),
+                $method,
+                $protocolVersion,
+            );
+            $router = Router::of(Endpoint::of('/hello{/name}'));
+
+            $result = $router($request)->unwrap();
+            $assert->count(1, $result);
+            $assert->same(
+                'world',
+                $result->get('name')->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+
+            $router = Router::of(Endpoint::of('/'));
+
+            $assert->object(
+                $router($request)->match(
                     static fn() => null,
                     static fn($e) => $e,
                 ),
