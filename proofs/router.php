@@ -525,4 +525,62 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Respond::withHttpErrors() on method not allowed',
+        given(
+            FUrl::any(),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+        )->filter(static fn($_, $a, $b) => $a !== $b),
+        static function($assert, $url, $method, $other, $protocolVersion) {
+            $request = Http\ServerRequest::of(
+                $url,
+                $method,
+                $protocolVersion,
+            );
+            $router = Router::of(
+                Method::{$other->name}()->otherwise(
+                    Respond::withHttpErrors(),
+                ),
+            );
+
+            $response = $router($request)->unwrap();
+
+            $assert->same(
+                Http\Response\StatusCode::methodNotAllowed,
+                $response->statusCode(),
+            );
+        },
+    );
+
+    yield proof(
+        'Respond::withHttpErrors() on path not found',
+        given(
+            FUrl::any(),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+        )->filter(static fn($a) => $a->path()->toString() !== '/'),
+        static function($assert, $url, $method, $other, $protocolVersion) {
+            $request = Http\ServerRequest::of(
+                $url,
+                $method,
+                $protocolVersion,
+            );
+            $router = Router::of(
+                Endpoint::of('/')->otherwise(
+                    Respond::withHttpErrors(),
+                ),
+            );
+
+            $response = $router($request)->unwrap();
+
+            $assert->same(
+                Http\Response\StatusCode::notFound,
+                $response->statusCode(),
+            );
+        },
+    );
 };

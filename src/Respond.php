@@ -33,4 +33,24 @@ final class Respond
     {
         return self::with(StatusCode::notFound);
     }
+
+    /**
+     * @psalm-pure
+     */
+    public static function withHttpErrors(): callable
+    {
+        return static fn(\Throwable $e) => Component::of(
+            static fn($request) => match (true) {
+                $e instanceof Exception\MethodNotAllowed => Attempt::result(Response::of(
+                    StatusCode::methodNotAllowed,
+                    $request->protocolVersion(),
+                )),
+                $e instanceof Exception\NotFound => Attempt::result(Response::of(
+                    StatusCode::notFound,
+                    $request->protocolVersion(),
+                )),
+                default => Attempt::error($e),
+            },
+        );
+    }
 }
