@@ -4,7 +4,10 @@
 [![Build Status](https://github.com/Innmind/Router/workflows/CI/badge.svg)](https://github.com/Innmind/Router/actions?query=workflow%3ACI)
 [![Type Coverage](https://shepherd.dev/github/Innmind/Router/coverage.svg)](https://shepherd.dev/github/Innmind/Router)
 
-Simple router using [url templates](https://github.com/Innmind/UrlTemplate) as route patterns.
+Monadic HTTP router.
+
+> [!NOTE]
+> This package has been heavily inspired from [F# Giraffe](https://github.com/giraffe-fsharp/Giraffe).
 
 ## Installation
 
@@ -16,58 +19,58 @@ composer require innmind/router
 
 ```php
 use Innmind\Router\{
-    Route,
-    Route\Name,
-    RequestMatcher\RequestMatcher,
-    UrlGenerator\UrlGenerator,
+    Router,
+    Any,
+    Method,
+    Endpoint,
+    Handle,
 };
 use Innmind\Http\{
-    Method,
     ServerRequest,
-};
-use Innmind\UrlTemplate\Template;
-use Innmind\Url\Url;
-use Innmind\Immutable\{
-    Sequence,
-    Maybe,
+    Response,
+    Response\StatusCode,
 };
 
-$routes = Sequence::of(
-    Route::of(
-        Method::post,
-        Template::of('/url{/template}'),
-    )->named(Name::of('routeName')),
-    Route::of(
-        Method::delete,
-        Template::of('/resource/{id}'),
-    )->named(Name::of('anotherRoute')),
+$router = Router::of(
+    Any::of(
+        Method::post()
+            ->pipe(Endpoint::of('/url{/template}'))
+            ->pipe(Handle::of(static fn(ServerRequest $request, string $template) => Response::of(
+                StatusCode::ok,
+                $request->protocolVersion(),
+            ))),
+        Method::delete()
+            ->pipe(Endpoint::of('/resource/{id}'))
+            ->pipe(Handle::of(static fn(ServerRequest $request, string $id) => Response::of(
+                StatusCode::ok,
+                $request->protocolVersion(),
+            ))),
+    ),
 );
 
-$requestMatcher = new RequestMatcher($routes);
-$route = $requestMatcher(/* instance of ServerRequest */); // Maybe<Route>
-$urlGenerator = new UrlGenerator($routes);
-$urlGenerator(Name::of('routeName')); // Url or throws NoMatchingRouteFound
+$response = $router(/* instance of ServerRequest */)->unwrap(); // Response
 ```
 
 ### Building a simple app
 
-Example using the `innmind/http-server` package to respond with files stored in a private folder.
+Example using the [`innmind/http-server`](https://github.com/Innmind/HttpServer/) package to respond with files stored in a private folder.
 
 ```php
 use Innmind\Router\{
-    Route,
-    RequestMatcher\RequestMatcher,
+    Router,
+    Any,
+    Method,
+    Endpoint,
+    Handle,
 };
 use Innmind\HttpServer\Main;
 use Innmind\OperatingSystem\OperatingSystem;
 use Innmind\Http\{
-    Method,
     ServerRequest,
     Response,
     Response\StatusCode,
 };
 use Innmind\Filesystem\Name;
-use Innmind\UrlTemplate\Template;
 use Innmind\Url\Path;
 
 new class extends Main {
@@ -75,28 +78,26 @@ new class extends Main {
 
     protected function preload(OperatingSystem $os): void
     {
-        $routes = Sequence::of(
-            Route::of(Method::get, Template::of('/image/{name}'))->handle(
-                fn($request, $variables) => $this->loadFile(
+        $this->router = Router::of(Any::of(
+            Method::get()
+                ->pipe(Endpoint::of('/image/{name}'))
+                ->pipe(Handle::of(static fn(string $name) => self::loadFile(
                     $os,
-                    $variables->get('name'),
-                ),
-            ),
-            Route::of(Method::get, Template::of('/image/random'))->handle(
-                fn($request) => $this->loadFile(
+                    $name,
+                ))),
+            Method::get()
+                ->pipe(Endpoint::of('/image/random'))
+                ->pipe(Handle::of(static fn() => self::loadFile(
                     $os,
                     generateRandomName(),
-                ),
-            ),
-        );
-
-        $this->router = new RequestMatcher($routes);
+                ))),
+        ));
     }
 
     protected function main(ServerRequest $request): Response
     {
         return ($this->router)($request)->match(
-            static fn($route) => $route->respondTo($request),
+            static fn($response) => $response,
             static fn() => Response::of(
                 StatusCode::notFound,
                 $request->protocolVersion(),
@@ -109,6 +110,7 @@ new class extends Main {
         return $os
             ->filesystem()
             ->mount(Path::of('some/private/folder/'))
+            ->unwrap()
             ->get(Name::of($name))
             ->match(
                 static fn($file) => Response::of(
