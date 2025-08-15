@@ -22,10 +22,12 @@ final class Endpoint
      *
      * @return Component<mixed, Map<string, string>>
      */
-    public static function of(string|Template $template): Component
+    public static function of(string|Template|Route $template): Component
     {
         if (\is_string($template)) {
             $template = Template::of($template);
+        } else if ($template instanceof Route) {
+            $template = $template->template();
         }
 
         return Component::of(
