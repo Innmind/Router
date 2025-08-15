@@ -55,7 +55,6 @@ final class Component
      */
     public function flatMap(callable $map): self
     {
-        $map = \Closure::fromCallable($map);
         $previous = $this->implementation;
 
         /** @psalm-suppress MixedArgument */
@@ -87,7 +86,6 @@ final class Component
      */
     public function otherwise(callable $recover): self
     {
-        $recover = \Closure::fromCallable($recover);
         $previous = $this->implementation;
 
         /** @psalm-suppress MixedArgument */
