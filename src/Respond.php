@@ -38,6 +38,8 @@ final class Respond
 
     /**
      * @psalm-pure
+     *
+     * @return callable(\Throwable): Component<mixed, Response>
      */
     #[\NoDiscard]
     public static function withHttpErrors(): callable

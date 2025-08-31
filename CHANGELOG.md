@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Add missing return type for `Respond::withHttpErrors()`
+
 ## 5.0.1 - 2025-08-31
 
 ### Fixes
