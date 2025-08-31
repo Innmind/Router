@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixes
+
+- Add missing return type for `Router::__invoke()`
+
 ## 5.0.0 - 2025-08-15
 
 ### Added

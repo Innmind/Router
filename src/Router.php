@@ -25,6 +25,9 @@ final class Router
     ) {
     }
 
+    /**
+     * @return Attempt<Response>
+     */
     #[\NoDiscard]
     public function __invoke(ServerRequest $request): Attempt
     {
