@@ -5,6 +5,7 @@
 ### Added
 
 - `Innmind\Router\Component\Provider`
+- `Innmind\Router\Pipe`
 
 ### Fixed
 
