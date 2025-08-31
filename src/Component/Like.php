@@ -23,6 +23,7 @@ trait Like
     #[\NoDiscard]
     public function map(callable $map): Component
     {
+        /** @psalm-suppress InvalidArgument */
         return $this
             ->toComponent()
             ->map($map);
@@ -38,6 +39,7 @@ trait Like
     #[\NoDiscard]
     public function flatMap(callable $map): Component
     {
+        /** @psalm-suppress InvalidArgument */
         return $this
             ->toComponent()
             ->flatMap($map);
@@ -53,6 +55,7 @@ trait Like
     #[\NoDiscard]
     public function pipe(Component|Provider $component): Component
     {
+        /** @psalm-suppress MixedArgumentTypeCoercion */
         return $this
             ->toComponent()
             ->pipe($component);
