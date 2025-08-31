@@ -16,7 +16,7 @@ final class Endpoint
      *
      * @psalm-pure
      *
-     * @param literal-string|Template $template
+     * @param literal-string|Template|Route $template
      *
      * @throws \Exception if the template is not a valid url template
      *
