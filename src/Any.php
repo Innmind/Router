@@ -13,11 +13,12 @@ final class Any
 {
     /**
      * @psalm-pure
+     * @template T
      *
-     * @param Component<mixed, Response> $a
-     * @param Component<mixed, Response> $rest
+     * @param Component<T, Response> $a
+     * @param Component<T, Response> $rest
      *
-     * @return Component<mixed, Response>
+     * @return Component<T, Response>
      */
     #[\NoDiscard]
     public static function of(Component $a, Component ...$rest): Component
@@ -32,10 +33,11 @@ final class Any
     /**
      * @internal
      * @psalm-pure
+     * @template T
      *
-     * @param Sequence<Component<mixed, Response>> $components
+     * @param Sequence<Component<T, Response>> $components
      *
-     * @return Component<mixed, Response>
+     * @return Component<T, Response>
      */
     #[\NoDiscard]
     public static function from(Sequence $components): Component
@@ -48,6 +50,7 @@ final class Any
                 ->sink($response)
                 ->until(
                     static function($_, $component, $continuation) use ($request, $input) {
+                        /** @psalm-suppress MixedArgument */
                         $result = $component($request, $input);
 
                         // Never try to recover from a handle error as it may

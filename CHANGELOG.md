@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixes
+
+- Add missing return type for `Router::__invoke()`
+- Use the same input type from components for the one produced by `Any`
+
 ## 5.0.0 - 2025-08-15
 
 ### Added
