@@ -50,6 +50,7 @@ final class Any
                 ->sink($response)
                 ->until(
                     static function($_, $component, $continuation) use ($request, $input) {
+                        /** @psalm-suppress MixedArgument */
                         $result = $component($request, $input);
 
                         // Never try to recover from a handle error as it may
