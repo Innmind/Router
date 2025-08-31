@@ -8,8 +8,8 @@ use Innmind\Http\ServerRequest;
 use Innmind\Immutable\Attempt;
 
 /**
- * @template I
- * @template O
+ * @template-covariant I
+ * @template-covariant O
  * @psalm-immutable
  */
 final class Component
