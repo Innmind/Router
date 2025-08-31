@@ -6,8 +6,8 @@ namespace Innmind\Router\Component;
 use Innmind\Router\Component;
 
 /**
- * @template I
- * @template O
+ * @template-covariant I
+ * @template-covariant O
  * @psalm-immutable
  */
 interface Provider
