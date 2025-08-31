@@ -15,5 +15,6 @@ interface Provider
     /**
      * @return Component<I, O>
      */
+    #[\NoDiscard]
     public function toComponent(): Component;
 }
