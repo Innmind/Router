@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- `Innmind\Router\Component\Provider`
+
 ### Fixed
 
 - Add missing return type for `Respond::withHttpErrors()`

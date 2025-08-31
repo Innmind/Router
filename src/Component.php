@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Router;
 
+use Innmind\Router\Component\Provider;
 use Innmind\Http\ServerRequest;
 use Innmind\Immutable\Attempt;
 
@@ -69,7 +70,7 @@ final class Component
     /**
      * @template T
      *
-     * @param callable(O): self<O, T> $map
+     * @param callable(O): (self<O, T>|Provider<O, T>) $map
      *
      * @return self<I, T>
      */
@@ -81,7 +82,10 @@ final class Component
         /** @psalm-suppress MixedArgument */
         return new self(
             static fn(ServerRequest $request, mixed $input) => $previous($request, $input)->flatMap(
-                static fn($output) => $map($output)($request, $output),
+                static fn($output) => self::collapse($map($output))(
+                    $request,
+                    $output,
+                ),
             ),
         );
     }
@@ -89,12 +93,12 @@ final class Component
     /**
      * @template T
      *
-     * @param self<O, T> $component
+     * @param self<O, T>|Provider<O, T> $component
      *
      * @return self<I, T>
      */
     #[\NoDiscard]
-    public function pipe(self $component): self
+    public function pipe(self|Provider $component): self
     {
         return $this->flatMap(static fn() => $component);
     }
@@ -102,7 +106,7 @@ final class Component
     /**
      * @template T
      *
-     * @param callable(\Throwable): self<I, T> $recover
+     * @param callable(\Throwable): (self<I, T>|Provider<I, T>) $recover
      *
      * @return self<I, T>
      */
@@ -118,7 +122,10 @@ final class Component
             static fn(ServerRequest $request, mixed $input) => $previous($request, $input)->recover(
                 static fn($error) => match (true) {
                     $error instanceof Exception\HandleError => Attempt::error($error),
-                    default => $recover($error)($request, $input),
+                    default => self::collapse($recover($error))(
+                        $request,
+                        $input,
+                    ),
                 },
             ),
         );
@@ -127,12 +134,12 @@ final class Component
     /**
      * @template T
      *
-     * @param self<I, T> $component
+     * @param self<I, T>|Provider<I, T> $component
      *
      * @return self<I, T>
      */
     #[\NoDiscard]
-    public function or(self $component): self
+    public function or(self|Provider $component): self
     {
         return $this->otherwise(static fn() => $component);
     }
@@ -151,5 +158,22 @@ final class Component
         return new self(
             static fn($request, $input) => $previous($request, $input)->mapError($map),
         );
+    }
+
+    /**
+     * @template A
+     * @template B
+     *
+     * @param self<A, B>|Provider<A, B> $component
+     *
+     * @return self<A, B>
+     */
+    private static function collapse(self|Provider $component): self
+    {
+        if ($component instanceof Provider) {
+            return $component->toComponent();
+        }
+
+        return $component;
     }
 }
