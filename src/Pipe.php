@@ -3,6 +3,12 @@ declare(strict_types = 1);
 
 namespace Innmind\Router;
 
+use Innmind\Http\{
+    ServerRequest,
+    Response,
+};
+use Innmind\Immutable\Attempt;
+
 /**
  * @psalm-immutable
  */
@@ -85,5 +91,17 @@ final class Pipe
     public function unlink(): Pipe\Method
     {
         return Pipe\Method::of(Method::unlink());
+    }
+
+    /**
+     * @param callable(ServerRequest): Attempt<Response> $handle
+     *
+     * @return Component<mixed, Response>
+     */
+    #[\NoDiscard]
+    public function handle(callable $handle): Component
+    {
+        /** @psalm-suppress PossiblyInvalidArgument */
+        return Handle::via($handle);
     }
 }
