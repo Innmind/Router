@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Router\Pipe\Forward\Method;
+namespace Innmind\Router\Pipe\Endpoint\Method;
 
 use Innmind\Router\{
     Component,
@@ -19,7 +19,7 @@ use Innmind\Immutable\{
 final class Spread
 {
     /**
-     * @param Component<Map<string, string>, Map<string, string>> $previous
+     * @param Component<mixed, Map<string, string>> $previous
      */
     private function __construct(
         private Component $previous,
@@ -30,7 +30,7 @@ final class Spread
      * @internal
      * @psalm-pure
      *
-     * @param Component<Map<string, string>, Map<string, string>> $previous
+     * @param Component<mixed, Map<string, string>> $previous
      */
     #[\NoDiscard]
     public static function of(Component $previous): self
@@ -41,7 +41,7 @@ final class Spread
     /**
      * @param Handle\Proxy|(callable(mixed...): Attempt<Http\Response>) $handle
      *
-     * @return Component<Map<string, string>, Http\Response>
+     * @return Component<mixed, Http\Response>
      */
     #[\NoDiscard]
     public function handle(Handle\Proxy|callable $handle): Component

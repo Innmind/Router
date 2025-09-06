@@ -10,6 +10,7 @@ use Innmind\Router\{
     Any,
     Respond,
     Collect,
+    Pipe,
 };
 use Innmind\Http;
 use Innmind\Url\Url;
@@ -323,6 +324,60 @@ return static function() {
     );
 
     yield proof(
+        'Any::from() should not override user errors',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+        ),
+        static function($assert, $method, $other, $protocolVersion) {
+            $in = Http\ServerRequest::of(
+                Url::of('/foo'),
+                $method,
+                $protocolVersion,
+            );
+            $expected = new Exception;
+            $router = Router::of(
+                Any::from(Sequence::of(
+                    Pipe::new()
+                        ->{$method->name}()
+                        ->handle(static fn() => Attempt::error($expected)),
+                    Pipe::new()
+                        ->{$other->name}()
+                        ->handle(static fn() => Attempt::error(new Exception)),
+                )),
+            );
+
+            $assert->same(
+                $expected,
+                $router($in)->match(
+                    static fn($response) => $response,
+                    static fn($error) => $error,
+                ),
+            );
+
+            $router = Router::of(
+                Any::from(Sequence::of(
+                    Pipe::new()
+                        ->{$method->name}()
+                        ->handle(static fn() => Attempt::error($expected)),
+                    Pipe::new()
+                        ->{$other->name}()
+                        ->handle(static fn() => Attempt::error(new Exception)),
+                )),
+            );
+
+            $assert->same(
+                $expected,
+                $router($in)->match(
+                    static fn($response) => $response,
+                    static fn($error) => $error,
+                ),
+            );
+        },
+    );
+
+    yield proof(
         'Respond::with()',
         given(
             Set::of(...Http\Method::cases()),
@@ -580,6 +635,46 @@ return static function() {
             $assert->same(
                 Http\Response\StatusCode::notFound,
                 $response->statusCode(),
+            );
+        },
+    );
+
+    yield proof(
+        'Handle::of() with a proxy',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+            Set::of(...Http\Response\StatusCode::cases()),
+        ),
+        static function($assert, $method, $protocolVersion, $status) {
+            $req = Http\ServerRequest::of(
+                Url::of('/foo'),
+                $method,
+                $protocolVersion,
+            );
+            $expected = Http\Response::of(
+                $status,
+                $req->protocolVersion(),
+            );
+            $router = Router::of(
+                Method::{$method->name}()
+                    ->map(Collect::of('method2'))
+                    ->pipe(Collect::merge(Endpoint::of('{/name}')))
+                    ->pipe(Handle::of(Handle\Proxy::of(
+                        static fn() => static function($method2, $name, $request, $unknown = null) use ($req, $expected, $assert, $method) {
+                            $assert->same($method, $method2);
+                            $assert->same('foo', $name);
+                            $assert->same($req, $request);
+                            $assert->null($unknown);
+
+                            return Attempt::result($expected);
+                        },
+                    ))),
+            );
+
+            $assert->same(
+                $expected,
+                $router($req)->unwrap(),
             );
         },
     );

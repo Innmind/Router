@@ -1,5 +1,16 @@
 # Changelog
 
+## 5.2.0 - 2025-09-06
+
+### Added
+
+- `Pipe->endpoint()->{method}()` pattern
+- `Innmind\Router\Handle\Proxy`
+
+### Fixed
+
+- `Any::from()` was erasing guarded errors
+
 ## 5.1.0 - 2025-09-06
 
 ### Added

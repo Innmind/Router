@@ -338,4 +338,50 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Pipe->endpoint()->method()->handle()',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+        ),
+        static function($assert, $method, $protocolVersion) {
+            $request = Http\ServerRequest::of(
+                Url::of('/foo'),
+                $method,
+                $protocolVersion,
+            );
+            $expected = Http\Response::of(
+                Http\Response\StatusCode::ok,
+                $request->protocolVersion(),
+            );
+            $router = Router::of(
+                Pipe::new()
+                    ->endpoint('{/watev}')
+                    ->{$method->name}()
+                    ->handle(static function($in, $input) use ($assert, $request, $expected) {
+                        $assert->same($request, $in);
+                        $assert->same(
+                            'foo',
+                            $input
+                                ->get('watev')
+                                ->match(
+                                    static fn($value) => $value,
+                                    static fn() => null,
+                                ),
+                        );
+
+                        return Attempt::result($expected);
+                    }),
+            );
+
+            $assert->same(
+                $expected,
+                $router($request)->match(
+                    static fn($response) => $response,
+                    static fn($error) => $error,
+                ),
+            );
+        },
+    );
 };

@@ -9,6 +9,7 @@ use Innmind\Router\{
     Component\Like,
     Handle,
     Any,
+    Method,
 };
 use Innmind\Http\{
     ServerRequest,
@@ -58,13 +59,112 @@ final class Endpoint implements Provider
     {
         return $this
             ->toComponent()
-            ->pipe(Handle::via($handle));
+            ->feed(Handle::via($handle));
     }
 
     #[\NoDiscard]
     public function spread(): Endpoint\Spread
     {
         return Endpoint\Spread::of($this->endpoint);
+    }
+
+    #[\NoDiscard]
+    public function get(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::get(),
+        );
+    }
+
+    #[\NoDiscard]
+    public function post(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::post(),
+        );
+    }
+
+    #[\NoDiscard]
+    public function put(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::put(),
+        );
+    }
+
+    #[\NoDiscard]
+    public function patch(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::patch(),
+        );
+    }
+
+    #[\NoDiscard]
+    public function delete(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::delete(),
+        );
+    }
+
+    #[\NoDiscard]
+    public function options(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::options(),
+        );
+    }
+
+    #[\NoDiscard]
+    public function trace(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::trace(),
+        );
+    }
+
+    #[\NoDiscard]
+    public function connect(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::connect(),
+        );
+    }
+
+    #[\NoDiscard]
+    public function head(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::head(),
+        );
+    }
+
+    #[\NoDiscard]
+    public function link(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::link(),
+        );
+    }
+
+    #[\NoDiscard]
+    public function unlink(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::unlink(),
+        );
     }
 
     /**

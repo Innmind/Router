@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Router\Pipe\Method;
+namespace Innmind\Router\Pipe\Endpoint;
 
 use Innmind\Router\{
     Component,
@@ -9,32 +9,28 @@ use Innmind\Router\{
     Component\Like,
     Handle,
 };
-use Innmind\Http\{
-    Response,
-    ServerRequest,
-    Method,
-};
+use Innmind\Http;
 use Innmind\Immutable\{
-    Map,
     Attempt,
+    Map,
 };
 
 /**
  * @psalm-immutable
  * @implements Provider<mixed, Map<string, string>>
  */
-final class Endpoint implements Provider
+final class Method implements Provider
 {
     /** @use Like<mixed, Map<string, string>> */
     use Like;
 
     /**
-     * @param Component<mixed, Method> $method
      * @param Component<mixed, Map<string, string>> $endpoint
+     * @param Component<mixed, Http\Method> $method
      */
     private function __construct(
-        private Component $method,
         private Component $endpoint,
+        private Component $method,
     ) {
     }
 
@@ -42,20 +38,19 @@ final class Endpoint implements Provider
      * @internal
      * @psalm-pure
      *
-     * @param Component<mixed, Method> $method
      * @param Component<mixed, Map<string, string>> $endpoint
+     * @param Component<mixed, Http\Method> $method
      */
-    public static function of(
-        Component $method,
-        Component $endpoint,
-    ): self {
-        return new self($method, $endpoint);
+    #[\NoDiscard]
+    public static function of(Component $endpoint, Component $method): self
+    {
+        return new self($endpoint, $method);
     }
 
     /**
-     * @param callable(ServerRequest, Map<string, string>): Attempt<Response> $handle
+     * @param callable(Http\ServerRequest, Map<string, string>): Attempt<Http\Response> $handle
      *
-     * @return Component<mixed, Response>
+     * @return Component<mixed, Http\Response>
      */
     #[\NoDiscard]
     public function handle(callable $handle): Component
@@ -65,19 +60,21 @@ final class Endpoint implements Provider
             ->feed(Handle::via($handle));
     }
 
-    #[\NoDiscard]
-    public function spread(): Endpoint\Spread
+    public function spread(): Method\Spread
     {
-        return Endpoint\Spread::of(
-            $this->method,
-            $this->endpoint,
-        );
+        return Method\Spread::of($this->toComponent());
     }
 
     #[\Override]
     public function toComponent(): Component
     {
-        /** @psalm-suppress MixedArgumentTypeCoercion Don't know why it complains */
-        return $this->method->feed($this->endpoint);
+        $method = $this->method;
+
+        /**
+         * @psalm-suppress MixedArgumentTypeCoercion
+         */
+        return $this->endpoint->guard(
+            static fn($input) => $method->map(static fn() => $input),
+        );
     }
 }
