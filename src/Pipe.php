@@ -7,6 +7,7 @@ use Innmind\Http\{
     ServerRequest,
     Response,
 };
+use Innmind\UrlTemplate\Template;
 use Innmind\Immutable\Attempt;
 
 /**
@@ -94,6 +95,15 @@ final class Pipe
     }
 
     /**
+     * @param literal-string|Template|Route $template
+     */
+    #[\NoDiscard]
+    public function endpoint(string|Template|Route $template): Pipe\Endpoint
+    {
+        return Pipe\Endpoint::of(Endpoint::of($template));
+    }
+
+    /**
      * @param callable(ServerRequest): Attempt<Response> $handle
      *
      * @return Component<mixed, Response>
@@ -103,5 +113,14 @@ final class Pipe
     {
         /** @psalm-suppress PossiblyInvalidArgument */
         return Handle::via($handle);
+    }
+
+    /**
+     * Use this pipe to build components for Pipe->endpoint()->any()
+     */
+    #[\NoDiscard]
+    public function forward(): Pipe\Forward
+    {
+        return Pipe\Forward::new();
     }
 }

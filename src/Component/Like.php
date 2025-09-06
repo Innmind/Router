@@ -71,6 +71,7 @@ trait Like
     #[\NoDiscard]
     public function otherwise(callable $recover): Component
     {
+        /** @psalm-suppress MixedArgumentTypeCoercion */
         return $this
             ->toComponent()
             ->otherwise($recover);
@@ -86,6 +87,7 @@ trait Like
     #[\NoDiscard]
     public function or(Component|Provider $component): Component
     {
+        /** @psalm-suppress MixedArgumentTypeCoercion */
         return $this
             ->toComponent()
             ->or($component);

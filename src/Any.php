@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Router;
 
+use Innmind\Router\Component\Provider;
 use Innmind\Http\Response;
 use Innmind\Immutable\{
     Sequence,
@@ -15,14 +16,21 @@ final class Any
      * @psalm-pure
      * @template T
      *
-     * @param Component<T, Response> $a
-     * @param Component<T, Response> $rest
+     * @param Component<T, Response>|Provider<T, Response> $a
+     * @param Component<T, Response>|Provider<T, Response> $rest
      *
      * @return Component<T, Response>
      */
     #[\NoDiscard]
-    public static function of(Component $a, Component ...$rest): Component
-    {
+    public static function of(
+        Component|Provider $a,
+        Component|Provider ...$rest,
+    ): Component {
+        if ($a instanceof Provider) {
+            /** @var Component<T, Response> */
+            $a = $a->toComponent();
+        }
+
         foreach ($rest as $b) {
             $a = $a->or($b);
         }
@@ -35,7 +43,7 @@ final class Any
      * @psalm-pure
      * @template T
      *
-     * @param Sequence<Component<T, Response>> $components
+     * @param Sequence<Component<T, Response>|Provider<T, Response>> $components
      *
      * @return Component<T, Response>
      */
@@ -47,10 +55,17 @@ final class Any
 
         return Component::of(
             static fn($request, $input) => $components
+                ->map(static fn($component) => match (true) {
+                    $component instanceof Provider => $component->toComponent(),
+                    default => $component,
+                })
                 ->sink($response)
                 ->until(
                     static function($_, $component, $continuation) use ($request, $input) {
-                        /** @psalm-suppress MixedArgument */
+                        /**
+                         * @psalm-suppress MixedArgument
+                         * @var Attempt<Response>
+                         */
                         $result = $component($request, $input);
 
                         // Never try to recover from a handle error as it may

@@ -1,27 +1,27 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Router\Pipe;
+namespace Innmind\Router\Pipe\Forward;
 
 use Innmind\Router\{
     Component,
     Component\Provider,
     Component\Like,
-    Route,
-    Endpoint,
     Handle,
 };
-use Innmind\UrlTemplate\Template;
 use Innmind\Http;
-use Innmind\Immutable\Attempt;
+use Innmind\Immutable\{
+    Attempt,
+    Map,
+};
 
 /**
  * @psalm-immutable
- * @implements Provider<mixed, Http\Method>
+ * @implements Provider<Map<string, string>, Map<string, string>>
  */
 final class Method implements Provider
 {
-    /** @use Like<mixed, Http\Method> */
+    /** @use Like<Map<string, string>, Map<string, string>> */
     use Like;
 
     /**
@@ -45,21 +45,9 @@ final class Method implements Provider
     }
 
     /**
-     * @param literal-string|Template|Route $template
-     */
-    #[\NoDiscard]
-    public function endpoint(string|Template|Route $template): Method\Endpoint
-    {
-        return Method\Endpoint::of(
-            $this->method,
-            Endpoint::of($template),
-        );
-    }
-
-    /**
-     * @param callable(Http\ServerRequest, Http\Method): Attempt<Http\Response> $handle
+     * @param callable(Http\ServerRequest, Map<string, string>): Attempt<Http\Response> $handle
      *
-     * @return Component<mixed, Http\Response>
+     * @return Component<Map<string, string>, Http\Response>
      */
     #[\NoDiscard]
     public function handle(callable $handle): Component
@@ -69,9 +57,21 @@ final class Method implements Provider
             ->pipe(Handle::via($handle));
     }
 
+    public function spread(): Method\Spread
+    {
+        return Method\Spread::of($this->toComponent());
+    }
+
     #[\Override]
     public function toComponent(): Component
     {
-        return $this->method;
+        $method = $this->method;
+
+        /**
+         * @psalm-suppress MixedArgumentTypeCoercion
+         * @var Component<Map<string, string>, Map<string, string>>
+         */
+        return Component::of(static fn($_, Map $input) => Attempt::result($input))
+            ->flatMap(static fn($input) => $method->map(static fn() => $input));
     }
 }
