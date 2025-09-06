@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Router;
 
+use Innmind\Router\Component\Provider;
 use Innmind\Http\{
     ServerRequest,
     Response,
@@ -113,6 +114,19 @@ final class Pipe
     {
         /** @psalm-suppress PossiblyInvalidArgument */
         return Handle::via($handle);
+    }
+
+    /**
+     * @param Component<mixed, Response>|Provider<mixed, Response> $first
+     * @param Component<mixed, Response>|Provider<mixed, Response> $rest
+     *
+     * @return Component<mixed, Response>
+     */
+    public function any(
+        Component|Provider $first,
+        Component|Provider ...$rest,
+    ): Component {
+        return Any::of($first, ...$rest);
     }
 
     /**
