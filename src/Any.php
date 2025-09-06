@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Router;
 
+use Innmind\Router\Component\Provider;
 use Innmind\Http\Response;
 use Innmind\Immutable\{
     Sequence,
@@ -15,16 +16,23 @@ final class Any
      * @psalm-pure
      * @template T
      *
-     * @param Component<T, Response> $a
-     * @param Component<T, Response> $rest
+     * @param Component<T, Response>|Provider<T, Response> $a
+     * @param Component<T, Response>|Provider<T, Response> $rest
      *
      * @return Component<T, Response>
      */
     #[\NoDiscard]
-    public static function of(Component $a, Component ...$rest): Component
-    {
+    public static function of(
+        Component|Provider $a,
+        Component|Provider ...$rest,
+    ): Component {
+        if ($a instanceof Provider) {
+            /** @var Component<T, Response> */
+            $a = $a->toComponent();
+        }
+
         foreach ($rest as $b) {
-            $a = $a->or($b);
+            $a = $a->xor($b);
         }
 
         return $a;
@@ -35,7 +43,7 @@ final class Any
      * @psalm-pure
      * @template T
      *
-     * @param Sequence<Component<T, Response>> $components
+     * @param Sequence<Component<T, Response>|Provider<T, Response>> $components
      *
      * @return Component<T, Response>
      */
@@ -44,21 +52,33 @@ final class Any
     {
         /** @var Attempt<Response> */
         $response = Attempt::error(new Exception\NoRouteProvided);
+        $beacon = new \Exception;
 
         return Component::of(
             static fn($request, $input) => $components
+                ->map(static fn($component) => match (true) {
+                    $component instanceof Provider => $component->toComponent(),
+                    default => $component,
+                })
                 ->sink($response)
                 ->until(
-                    static function($_, $component, $continuation) use ($request, $input) {
-                        /** @psalm-suppress MixedArgument */
-                        $result = $component($request, $input);
+                    static function($previous, $component, $continuation) use ($beacon, $request, $input) {
+                        /**
+                         * @psalm-suppress MixedArgument
+                         * @var Attempt<Response>
+                         */
+                        $result = $previous
+                            ->mapError(static fn() => $beacon)
+                            ->xrecover(static fn() => $component($request, $input));
 
-                        // Never try to recover from a handle error as it may
-                        // lead to another handle being called
+                        // If the new error is the beacon then it means the
+                        // previous error was a guarded one and it will try to
+                        // recover from it. So we can stop iterating other
+                        // components.
                         return $result->match(
                             static fn() => $continuation->stop($result),
-                            static fn($e) => match (true) {
-                                $e instanceof Exception\HandleError => $continuation->stop($result),
+                            static fn($e) => match ($e) {
+                                $beacon => $continuation->stop($result),
                                 default => $continuation->continue($result),
                             },
                         );

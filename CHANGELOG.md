@@ -1,5 +1,20 @@
 # Changelog
 
+## 5.1.0 - 2025-09-06
+
+### Added
+
+- `Innmind\Router\Component\Provider`
+- `Innmind\Router\Pipe`
+- `Innmind\Router\Component::guard()`
+- `Innmind\Router\Component::feed()`
+- `Innmind\Router\Component::xotherwise()`
+- `Innmind\Router\Component::xor()`
+
+### Fixed
+
+- Add missing return type for `Respond::withHttpErrors()`
+
 ## 5.0.1 - 2025-08-31
 
 ### Fixes

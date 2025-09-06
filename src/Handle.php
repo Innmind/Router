@@ -25,8 +25,8 @@ final class Handle
     #[\NoDiscard]
     public static function via(callable $handler): Component
     {
-        return Component::of($handler)->mapError(
-            static fn($e) => new Exception\HandleError($e),
+        return Component::of(static fn($_, $input) => Attempt::result($input))->guard(
+            static fn() => Component::of($handler),
         );
     }
 
@@ -41,7 +41,7 @@ final class Handle
     public static function of(callable $handler): Component
     {
         /** @var Component<Map<string, mixed>, Response> */
-        return Component::of(
+        return self::via(
             static function($request, Map $variables) use ($handler) {
                 if (!$variables->contains('request')) {
                     $variables = ($variables)('request', $request);
@@ -74,6 +74,6 @@ final class Handle
 
                 return $handler(...$args);
             },
-        )->mapError(static fn($e) => new Exception\HandleError($e));
+        );
     }
 }

@@ -3,12 +3,13 @@ declare(strict_types = 1);
 
 namespace Innmind\Router;
 
+use Innmind\Router\Component\Provider;
 use Innmind\Http\ServerRequest;
 use Innmind\Immutable\Attempt;
 
 /**
- * @template I
- * @template O
+ * @template-covariant I
+ * @template-covariant O
  * @psalm-immutable
  */
 final class Component
@@ -69,7 +70,7 @@ final class Component
     /**
      * @template T
      *
-     * @param callable(O): self<O, T> $map
+     * @param callable(O): (self<O, T>|Provider<O, T>) $map
      *
      * @return self<I, T>
      */
@@ -81,7 +82,10 @@ final class Component
         /** @psalm-suppress MixedArgument */
         return new self(
             static fn(ServerRequest $request, mixed $input) => $previous($request, $input)->flatMap(
-                static fn($output) => $map($output)($request, $output),
+                static fn($output) => self::collapse($map($output))(
+                    $request,
+                    $output,
+                ),
             ),
         );
     }
@@ -89,12 +93,35 @@ final class Component
     /**
      * @template T
      *
-     * @param self<O, T> $component
+     * @param callable(O): (self<O, T>|Provider<O, T>) $map
      *
      * @return self<I, T>
      */
     #[\NoDiscard]
-    public function pipe(self $component): self
+    public function guard(callable $map): self
+    {
+        $previous = $this->implementation;
+
+        /** @psalm-suppress MixedArgument */
+        return new self(
+            static fn(ServerRequest $request, mixed $input) => $previous($request, $input)->guard(
+                static fn($output) => self::collapse($map($output))(
+                    $request,
+                    $output,
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @template T
+     *
+     * @param self<O, T>|Provider<O, T> $component
+     *
+     * @return self<I, T>
+     */
+    #[\NoDiscard]
+    public function pipe(self|Provider $component): self
     {
         return $this->flatMap(static fn() => $component);
     }
@@ -102,7 +129,20 @@ final class Component
     /**
      * @template T
      *
-     * @param callable(\Throwable): self<I, T> $recover
+     * @param self<O, T>|Provider<O, T> $component
+     *
+     * @return self<I, T>
+     */
+    #[\NoDiscard]
+    public function feed(self|Provider $component): self
+    {
+        return $this->guard(static fn() => $component);
+    }
+
+    /**
+     * @template T
+     *
+     * @param callable(\Throwable): (self<I, T>|Provider<I, T>) $recover
      *
      * @return self<I, T>
      */
@@ -111,15 +151,13 @@ final class Component
     {
         $previous = $this->implementation;
 
-        // Never try to recover from a handle error as it may lead to another
-        // handle being called
         /** @psalm-suppress MixedArgument */
         return new self(
             static fn(ServerRequest $request, mixed $input) => $previous($request, $input)->recover(
-                static fn($error) => match (true) {
-                    $error instanceof Exception\HandleError => Attempt::error($error),
-                    default => $recover($error)($request, $input),
-                },
+                static fn($error) => self::collapse($recover($error))(
+                    $request,
+                    $input,
+                ),
             ),
         );
     }
@@ -127,14 +165,50 @@ final class Component
     /**
      * @template T
      *
-     * @param self<I, T> $component
+     * @param callable(\Throwable): (self<I, T>|Provider<I, T>) $recover
      *
      * @return self<I, T>
      */
     #[\NoDiscard]
-    public function or(self $component): self
+    public function xotherwise(callable $recover): self
+    {
+        $previous = $this->implementation;
+
+        /** @psalm-suppress MixedArgument */
+        return new self(
+            static fn(ServerRequest $request, mixed $input) => $previous($request, $input)->xrecover(
+                static fn($error) => self::collapse($recover($error))(
+                    $request,
+                    $input,
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @template T
+     *
+     * @param self<I, T>|Provider<I, T> $component
+     *
+     * @return self<I, T>
+     */
+    #[\NoDiscard]
+    public function or(self|Provider $component): self
     {
         return $this->otherwise(static fn() => $component);
+    }
+
+    /**
+     * @template T
+     *
+     * @param self<I, T>|Provider<I, T> $component
+     *
+     * @return self<I, T>
+     */
+    #[\NoDiscard]
+    public function xor(self|Provider $component): self
+    {
+        return $this->xotherwise(static fn() => $component);
     }
 
     /**
@@ -151,5 +225,22 @@ final class Component
         return new self(
             static fn($request, $input) => $previous($request, $input)->mapError($map),
         );
+    }
+
+    /**
+     * @template A
+     * @template B
+     *
+     * @param self<A, B>|Provider<A, B> $component
+     *
+     * @return self<A, B>
+     */
+    private static function collapse(self|Provider $component): self
+    {
+        if ($component instanceof Provider) {
+            return $component->toComponent();
+        }
+
+        return $component;
     }
 }
