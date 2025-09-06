@@ -10,6 +10,7 @@ use Innmind\Router\{
     Any,
     Respond,
     Collect,
+    Pipe,
 };
 use Innmind\Http;
 use Innmind\Url\Url;
@@ -317,6 +318,60 @@ return static function() {
                 $router($request)->match(
                     static fn() => null,
                     static fn($e) => $e,
+                ),
+            );
+        },
+    );
+
+    yield proof(
+        'Any::from() should not override user errors',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+        ),
+        static function($assert, $method, $other, $protocolVersion) {
+            $in = Http\ServerRequest::of(
+                Url::of('/foo'),
+                $method,
+                $protocolVersion,
+            );
+            $expected = new Exception;
+            $router = Router::of(
+                Any::from(Sequence::of(
+                    Pipe::new()
+                        ->{$method->name}()
+                        ->handle(static fn() => Attempt::error($expected)),
+                    Pipe::new()
+                        ->{$other->name}()
+                        ->handle(static fn() => Attempt::error(new Exception)),
+                )),
+            );
+
+            $assert->same(
+                $expected,
+                $router($in)->match(
+                    static fn($response) => $response,
+                    static fn($error) => $error,
+                ),
+            );
+
+            $router = Router::of(
+                Any::from(Sequence::of(
+                    Pipe::new()
+                        ->{$method->name}()
+                        ->handle(static fn() => Attempt::error($expected)),
+                    Pipe::new()
+                        ->{$other->name}()
+                        ->handle(static fn() => Attempt::error(new Exception)),
+                )),
+            );
+
+            $assert->same(
+                $expected,
+                $router($in)->match(
+                    static fn($response) => $response,
+                    static fn($error) => $error,
                 ),
             );
         },

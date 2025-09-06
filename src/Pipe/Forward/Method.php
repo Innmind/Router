@@ -54,7 +54,7 @@ final class Method implements Provider
     {
         return $this
             ->toComponent()
-            ->pipe(Handle::via($handle));
+            ->feed(Handle::via($handle));
     }
 
     public function spread(): Method\Spread
