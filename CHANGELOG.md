@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- `Pipe->endpoint()->{method}()` pattern
+
 ### Fixed
 
 - `Any::from()` was erasing guarded errors
