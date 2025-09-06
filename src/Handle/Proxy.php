@@ -16,11 +16,6 @@ final class Proxy
     ) {
     }
 
-    public function __invoke(mixed ...$args): Attempt
-    {
-        return ($this->load)()(...$args);
-    }
-
     /**
      * @param callable(): (callable(mixed...): Attempt<Response>) $load
      */
