@@ -78,6 +78,6 @@ final class Endpoint implements Provider
     public function toComponent(): Component
     {
         /** @psalm-suppress MixedArgumentTypeCoercion Don't know why it complains */
-        return $this->method->pipe($this->endpoint);
+        return $this->method->feed($this->endpoint);
     }
 }

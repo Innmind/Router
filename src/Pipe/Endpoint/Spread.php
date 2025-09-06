@@ -48,6 +48,6 @@ final class Spread
         /** @psalm-suppress MixedArgumentTypeCoercion Don't know why it complains */
         return $this
             ->endpoint
-            ->pipe(Handle::of($handle));
+            ->feed(Handle::of($handle));
     }
 }

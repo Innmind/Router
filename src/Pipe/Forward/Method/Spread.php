@@ -47,6 +47,6 @@ final class Spread
     public function handle(callable $handle): Component
     {
         /** @psalm-suppress MixedArgumentTypeCoercion */
-        return $this->previous->pipe(Handle::of($handle));
+        return $this->previous->feed(Handle::of($handle));
     }
 }
