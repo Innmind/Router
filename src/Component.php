@@ -151,18 +151,13 @@ final class Component
     {
         $previous = $this->implementation;
 
-        // Never try to recover from a handle error as it may lead to another
-        // handle being called
         /** @psalm-suppress MixedArgument */
         return new self(
             static fn(ServerRequest $request, mixed $input) => $previous($request, $input)->recover(
-                static fn($error) => match (true) {
-                    $error instanceof Exception\HandleError => Attempt::error($error),
-                    default => self::collapse($recover($error))(
-                        $request,
-                        $input,
-                    ),
-                },
+                static fn($error) => self::collapse($recover($error))(
+                    $request,
+                    $input,
+                ),
             ),
         );
     }
