@@ -32,7 +32,7 @@ final class Any
         }
 
         foreach ($rest as $b) {
-            $a = $a->or($b);
+            $a = $a->xor($b);
         }
 
         return $a;
@@ -52,6 +52,7 @@ final class Any
     {
         /** @var Attempt<Response> */
         $response = Attempt::error(new Exception\NoRouteProvided);
+        $beacon = new \Exception;
 
         return Component::of(
             static fn($request, $input) => $components
@@ -61,19 +62,23 @@ final class Any
                 })
                 ->sink($response)
                 ->until(
-                    static function($_, $component, $continuation) use ($request, $input) {
+                    static function($previous, $component, $continuation) use ($beacon, $request, $input) {
                         /**
                          * @psalm-suppress MixedArgument
                          * @var Attempt<Response>
                          */
-                        $result = $component($request, $input);
+                        $result = $previous
+                            ->mapError(static fn() => $beacon)
+                            ->xrecover(static fn() => $component($request, $input));
 
-                        // Never try to recover from a handle error as it may
-                        // lead to another handle being called
+                        // If the new error is the beacon then it means the
+                        // previous error was a guarded one and it will try to
+                        // recover from it. So we can stop iterating other
+                        // components.
                         return $result->match(
                             static fn() => $continuation->stop($result),
-                            static fn($e) => match (true) {
-                                $e instanceof Exception\HandleError => $continuation->stop($result),
+                            static fn($e) => match ($e) {
+                                $beacon => $continuation->stop($result),
                                 default => $continuation->continue($result),
                             },
                         );

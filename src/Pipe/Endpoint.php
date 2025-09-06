@@ -79,7 +79,7 @@ final class Endpoint implements Provider
         Component|Provider $first,
         Component|Provider ...$rest,
     ): Component {
-        return $this->endpoint->pipe(
+        return $this->endpoint->feed(
             Any::of($first, ...$rest),
         );
     }

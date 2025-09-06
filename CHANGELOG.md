@@ -6,6 +6,10 @@
 
 - `Innmind\Router\Component\Provider`
 - `Innmind\Router\Pipe`
+- `Innmind\Router\Component::guard()`
+- `Innmind\Router\Component::feed()`
+- `Innmind\Router\Component::xotherwise()`
+- `Innmind\Router\Component::xor()`
 
 ### Fixed
 

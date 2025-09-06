@@ -280,4 +280,62 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Pipe guard errors',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+        ),
+        static function($assert, $method, $other, $protocolVersion) {
+            $in = Http\ServerRequest::of(
+                Url::of('/foo'),
+                $method,
+                $protocolVersion,
+            );
+            $expected = new Exception;
+            $router = Router::of(
+                Pipe::new()
+                    ->endpoint('{/watev}')
+                    ->any(
+                        Pipe::new()
+                            ->forward()
+                            ->{$method->name}()
+                            ->handle(static fn() => Attempt::error($expected)),
+                        Pipe::new()
+                            ->forward()
+                            ->{$other->name}()
+                            ->handle(static fn() => Attempt::error(new Exception)),
+                    ),
+            );
+
+            $assert->same(
+                $expected,
+                $router($in)->match(
+                    static fn($response) => $response,
+                    static fn($error) => $error,
+                ),
+            );
+
+            $router = Router::of(
+                Pipe::new()->any(
+                    Pipe::new()
+                        ->{$method->name}()
+                        ->handle(static fn() => Attempt::error($expected)),
+                    Pipe::new()
+                        ->{$other->name}()
+                        ->handle(static fn() => Attempt::error(new Exception)),
+                ),
+            );
+
+            $assert->same(
+                $expected,
+                $router($in)->match(
+                    static fn($response) => $response,
+                    static fn($error) => $error,
+                ),
+            );
+        },
+    );
 };
