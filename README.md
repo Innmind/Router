@@ -30,21 +30,65 @@ use Innmind\Http\{
     Response,
     Response\StatusCode,
 };
+use Innmind\Immutable\Attempt;
 
 $router = Router::of(
     Any::of(
         Method::post()
             ->pipe(Endpoint::of('/url{/template}'))
-            ->pipe(Handle::of(static fn(ServerRequest $request, string $template) => Response::of(
+            ->pipe(Handle::of(static fn(ServerRequest $request, string $template) => Attempt::result(Response::of(
                 StatusCode::ok,
                 $request->protocolVersion(),
-            ))),
+            )))),
         Method::delete()
             ->pipe(Endpoint::of('/resource/{id}'))
-            ->pipe(Handle::of(static fn(ServerRequest $request, string $id) => Response::of(
+            ->pipe(Handle::of(static fn(ServerRequest $request, string $id) => Attempt::result(Response::of(
                 StatusCode::ok,
                 $request->protocolVersion(),
-            ))),
+            )))),
+    ),
+);
+
+$response = $router(/* instance of ServerRequest */)->unwrap(); // Response
+```
+
+This example can be simplified as:
+
+```php
+use Innmind\Router\{
+    Router,
+    Pipe,
+};
+use Innmind\Http\{
+    ServerRequest,
+    Response,
+    Response\StatusCode,
+};
+use Innmind\Immutable\Attempt;
+
+$pipe = Pipe::new();
+$router = Router::of(
+    $pipe->any(
+        $pipe
+            ->post()
+            ->endpoint('/url{/template}')
+            ->spread()
+            ->handle(static fn(ServerRequest $request, string $template) => Attempt::result(
+                Response::of(
+                    StatusCode::ok,
+                    $request->protocolVersion(),
+                ),
+            )),
+        $pipe
+            ->delete()
+            ->endpoint('/resource/{id}')
+            ->spread()
+            ->handle(static fn(ServerRequest $request, string $id) => Attempt::result(
+                Response::of(
+                    StatusCode::ok,
+                    $request->protocolVersion(),
+                ),
+            )),
     ),
 );
 
