@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- `Any::from()` was erasing guarded errors
+
 ## 5.1.0 - 2025-09-06
 
 ### Added

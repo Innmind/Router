@@ -78,7 +78,7 @@ final class Any
                         return $result->match(
                             static fn() => $continuation->stop($result),
                             static fn($e) => match ($e) {
-                                $beacon => $continuation->stop($result),
+                                $beacon => $continuation->stop($previous),
                                 default => $continuation->continue($result),
                             },
                         );
