@@ -33,16 +33,20 @@ final class Handle
     /**
      * @psalm-pure
      *
-     * @param callable(...mixed): Attempt<Response> $handler
+     * @param Handle\Proxy|(callable(mixed...): Attempt<Response>) $handler
      *
      * @return Component<Map<string, mixed>, Response>
      */
     #[\NoDiscard]
-    public static function of(callable $handler): Component
+    public static function of(Handle\Proxy|callable $handler): Component
     {
         /** @var Component<Map<string, mixed>, Response> */
         return self::via(
             static function($request, Map $variables) use ($handler) {
+                if ($handler instanceof Handle\Proxy) {
+                    $handler = $handler->unwrap();
+                }
+
                 if (!$variables->contains('request')) {
                     $variables = ($variables)('request', $request);
                 }
