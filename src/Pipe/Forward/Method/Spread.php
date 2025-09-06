@@ -39,12 +39,12 @@ final class Spread
     }
 
     /**
-     * @param callable(...mixed): Attempt<Http\Response> $handle
+     * @param Handle\Proxy|(callable(mixed...): Attempt<Http\Response>) $handle
      *
      * @return Component<Map<string, string>, Http\Response>
      */
     #[\NoDiscard]
-    public function handle(callable $handle): Component
+    public function handle(Handle\Proxy|callable $handle): Component
     {
         /** @psalm-suppress MixedArgumentTypeCoercion */
         return $this->previous->feed(Handle::of($handle));

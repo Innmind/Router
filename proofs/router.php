@@ -638,4 +638,44 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Handle::of() with a proxy',
+        given(
+            Set::of(...Http\Method::cases()),
+            Set::of(...Http\ProtocolVersion::cases()),
+            Set::of(...Http\Response\StatusCode::cases()),
+        ),
+        static function($assert, $method, $protocolVersion, $status) {
+            $req = Http\ServerRequest::of(
+                Url::of('/foo'),
+                $method,
+                $protocolVersion,
+            );
+            $expected = Http\Response::of(
+                $status,
+                $req->protocolVersion(),
+            );
+            $router = Router::of(
+                Method::{$method->name}()
+                    ->map(Collect::of('method2'))
+                    ->pipe(Collect::merge(Endpoint::of('{/name}')))
+                    ->pipe(Handle::of(Handle\Proxy::of(
+                        static fn() => static function($method2, $name, $request, $unknown = null) use ($req, $expected, $assert, $method) {
+                            $assert->same($method, $method2);
+                            $assert->same('foo', $name);
+                            $assert->same($req, $request);
+                            $assert->null($unknown);
+
+                            return Attempt::result($expected);
+                        },
+                    ))),
+            );
+
+            $assert->same(
+                $expected,
+                $router($req)->unwrap(),
+            );
+        },
+    );
 };

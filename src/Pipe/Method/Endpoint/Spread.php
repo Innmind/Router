@@ -46,12 +46,12 @@ final class Spread
     }
 
     /**
-     * @param callable(...mixed): Attempt<Response> $handle
+     * @param Handle\Proxy|(callable(mixed...): Attempt<Response>) $handle
      *
      * @return Component<mixed, Response>
      */
     #[\NoDiscard]
-    public function handle(callable $handle): Component
+    public function handle(Handle\Proxy|callable $handle): Component
     {
         /** @psalm-suppress MixedArgumentTypeCoercion Don't know why it complains */
         return $this

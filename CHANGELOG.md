@@ -5,6 +5,7 @@
 ### Added
 
 - `Pipe->endpoint()->{method}()` pattern
+- `Innmind\Router\Handle\Proxy`
 
 ### Fixed
 
