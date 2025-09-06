@@ -73,7 +73,7 @@ final class Any
 
                         // If the new error is the beacon then it means the
                         // previous error was a guarded one and it will try to
-                        // recover from it. So we can stop iterating other
+                        // recover from it. So we can stop iterating over other
                         // components.
                         return $result->match(
                             static fn() => $continuation->stop($result),
