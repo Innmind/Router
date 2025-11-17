@@ -127,7 +127,7 @@ return static function() {
             $router = Router::of(Endpoint::of('/hello{/name}'));
 
             $result = $router($request)->unwrap();
-            $assert->count(1, $result);
+            $assert->same(1, $result->size());
             $assert->same(
                 'world',
                 $result->get('name')->match(
@@ -182,7 +182,7 @@ return static function() {
             $router = Router::of(Host::of('example{.tld}/'));
 
             $result = $router($request)->unwrap();
-            $assert->count(1, $result);
+            $assert->same(1, $result->size());
             $assert->same(
                 'com',
                 $result->get('tld')->match(

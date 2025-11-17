@@ -46,8 +46,8 @@ final class Host
                         ->withoutQuery()
                         ->withoutFragment();
 
-                    return match ($template->matches($url)) {
-                        true => $template->extract($url),
+                    return match ($template->matches($url)->unwrap()) {
+                        true => $template->extract($url)->unwrap(),
                         false => throw new Exception\NotFound,
                     };
                 },
