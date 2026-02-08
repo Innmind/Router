@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.0.0 - 2026-02-08
+
+### Changed
+
+- Requires PHP `8.4`
+- Requires `innmind/http:~9.0`
+
 ## 5.2.0 - 2025-09-06
 
 ### Added
