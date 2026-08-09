@@ -2,7 +2,10 @@
     "name": "innmind/router",
     "type": "library",
     "description": "HTTP router",
-    "keywords": ["http", "router"],
+    "keywords": [
+        "http",
+        "router"
+    ],
     "homepage": "http://github.com/Innmind/Router",
     "license": "MIT",
     "authors": [
