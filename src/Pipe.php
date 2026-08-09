@@ -36,6 +36,12 @@ final class Pipe
     }
 
     #[\NoDiscard]
+    public function query(): Pipe\Method
+    {
+        return Pipe\Method::of(Method::query());
+    }
+
+    #[\NoDiscard]
     public function post(): Pipe\Method
     {
         return Pipe\Method::of(Method::post());

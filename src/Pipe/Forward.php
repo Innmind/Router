@@ -31,6 +31,12 @@ final class Forward
     }
 
     #[\NoDiscard]
+    public function query(): Forward\Method
+    {
+        return Forward\Method::of(Method::query());
+    }
+
+    #[\NoDiscard]
     public function post(): Forward\Method
     {
         return Forward\Method::of(Method::post());

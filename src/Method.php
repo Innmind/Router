@@ -25,6 +25,17 @@ final class Method
      * @return Component<mixed, Http\Method>
      */
     #[\NoDiscard]
+    public static function query(): Component
+    {
+        return self::of(Http\Method::query);
+    }
+
+    /**
+     * @psalm-pure
+     *
+     * @return Component<mixed, Http\Method>
+     */
+    #[\NoDiscard]
     public static function post(): Component
     {
         return self::of(Http\Method::post);
