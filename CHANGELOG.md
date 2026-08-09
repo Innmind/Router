@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Support for `Innmind\Http\Method::query`
+
+### Changed
+
+- Requires PHP `8.5`
+
 ## 6.0.0 - 2026-02-08
 
 ### Changed

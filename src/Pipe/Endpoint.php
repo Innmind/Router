@@ -78,6 +78,15 @@ final class Endpoint implements Provider
     }
 
     #[\NoDiscard]
+    public function query(): Endpoint\Method
+    {
+        return Endpoint\Method::of(
+            $this->endpoint,
+            Method::query(),
+        );
+    }
+
+    #[\NoDiscard]
     public function post(): Endpoint\Method
     {
         return Endpoint\Method::of(
